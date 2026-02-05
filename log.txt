@@ -1,0 +1,28 @@
+1. Login
+2. Register
+
+My VC
+Request -> Approve/Accept the invitation
+
+
+VC - Link
+
+
+Admin/User
+
+VC Create
+
+How user can join in VC or how admin of VC can invite users
+
+GET: BaseURL/VC/join/vc-id
+
+
+Start VC
+
+
+
+
+
+
+
+

@@ -6,15 +6,29 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "cron": "node scripts/local-cron.js",
+    "cron:test": "node -e \"fetch('http://localhost:3000/api/cron/monthly-contributions?secret=vc-management-cron-secret-2024', {method:'POST'}).then(r=>r.json()).then(console.log)\""
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/material": "^7.3.7",
+    "@tanstack/react-query": "^5.90.20",
+    "axios": "^1.13.4",
+    "bcryptjs": "^3.0.3",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.1.5",
     "next": "16.1.6",
+    "node-cron": "^4.2.1",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "react-hot-toast": "^2.6.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

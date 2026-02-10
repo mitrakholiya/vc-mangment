@@ -15,6 +15,6 @@ export const useUserVcMonthlyById = (id: string) => {
 
     enabled: !!id,
     staleTime: 0,
-    cacheTime: 0,
+    gcTime: 0,
   });
 };

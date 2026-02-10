@@ -1,12 +1,20 @@
-
-
-
 import { useQuery } from "@tanstack/react-query";
-import { viewVenture } from "./getVenture";
+import { viewVenture, viewUserVcMonthlyById } from "./getVenture";
 
 export const useViewVentureQuery = () => {
-    return useQuery({
-        queryKey: ["viewVenture"],
-        queryFn: viewVenture,
-    });
+  return useQuery({
+    queryKey: ["viewVenture"],
+    queryFn: viewVenture,
+  });
+};
+
+export const useUserVcMonthlyById = (id: string) => {
+  return useQuery({
+    queryKey: ["viewVentureById"],
+    queryFn: () => viewUserVcMonthlyById(id),
+
+    enabled: !!id,
+    staleTime: 0,
+    cacheTime: 0,
+  });
 };

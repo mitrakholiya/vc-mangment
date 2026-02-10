@@ -4,221 +4,193 @@ import { Input } from "@/components/Input";
 // import { IMember } from "@/models/venture.model";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import axios from "axios"
+import axios from "axios";
 import { createVenture } from "@/hooks/venture/useVenture";
 import { createMembership } from "@/hooks/membership/membership";
 
-const Page = () => {
-    const router = useRouter()
-    useEffect(() => {
-        const getUser = async () => {
-            const res = await axios.get("/api/getuser")
-            if (res.data.success) {
+const Page: React.FC = () => {
+  const router = useRouter();
 
-                setVc(prev => ({
-                    ...prev,
-                    created_by: res.data.data.userId,
-                }));
-            }
-        }
-        getUser()
-    }, [])
+  const [vc, setVc] = useState({
+    name: "",
+    monthly_emi: "", // Was monthly_contribution
+    interest_rate: "", // Was loan_interest_percent
+    max_loan_amount: "", // Was max_loan_percent
+    start_date: "", // New
+    collection_date: "", // New (Day of month 1-31)
+    loan_repayment_percent: "", // New
+    created_by: "",
+  });
 
-    const [vc, setVc] = useState({
-        name: "",
-        currency: "",
-        monthly_contribution: "",
-        loan_interest_percent: "",
-        max_loan_percent: "",
-        created_by: "",
-    });
-    // // Get User Created
+  useEffect(() => {
+    const getUser = async () => {
+      const res = await axios.get("/api/getuser");
+      if (res.data.success) {
+        setVc((prev) => ({
+          ...prev,
+          created_by: res.data.data.userId,
+        }));
+      }
+    };
+    getUser();
+  }, []);
 
+  // SUBMIT (final object)
+  const submitHandler = async () => {
+    // Basic validation
+    if (
+      !vc.name ||
+      !vc.monthly_emi ||
+      !vc.interest_rate ||
+      !vc.max_loan_amount ||
+      !vc.start_date ||
+      !vc.collection_date ||
+      !vc.loan_repayment_percent
+    ) {
+      toast.error("Please fill all fields");
+      return;
+    }
 
-
-
-
-    // SUBMIT (final object)
-    const submitHandler = async () => {
-        const payload = {
-            ...vc,
-            name: String(vc.name),
-            currency: String(vc.currency),
-            monthly_contribution: Number(vc.monthly_contribution),
-            loan_interest_percent: Number(vc.loan_interest_percent),
-            max_loan_percent: Number(vc.max_loan_percent),
-        };
-
-
-        const response = await createVenture(payload);
-
-        if (response?.success) {
-            toast.success("Sussecfull")
-            console.log(response.data);
-            
-            const res= await createMembership({
-                vc_id: response.data._id,
-                role:"ADMIN"
-            })
-
-            if(res?.success){
-                toast.success(res?.message)
-            }
-
-
-            setVc({
-                name: "",
-                currency: "",
-                monthly_contribution: "",
-                loan_interest_percent: "",
-                max_loan_percent: "",
-                created_by: "",
-            })
-            router.push("/profile")
-        }
+    const payload = {
+      ...vc,
+      name: String(vc.name),
+      monthly_emi: Number(vc.monthly_emi),
+      interest_rate: Number(vc.interest_rate),
+      max_loan_amount: Number(vc.max_loan_amount),
+      start_date: vc.start_date, // Date string is fine usually, backend converts
+      collection_date: Number(vc.collection_date),
+      loan_repayment_percent: Number(vc.loan_repayment_percent),
     };
 
-    return (
-        <div className="min-h-screen text-black  p-4">
-            <div className="bg-white w-full rounded-lg p-2 space-y-4 ">
+    const response = await createVenture(payload);
 
-                {/* VC DETAILS */}
-                <h2 className="text-xl font-semibold">VC Details</h2>
-                {/* Name */}
-                <div>
-                    <Input
-                        type="text"
-                        placeholder="VC Name"
-                        value={vc.name}
-                        setValue={(val) => setVc({ ...vc, name: val })}
-                    />
-                </div>
-                <div className="">
-                    <Input
-                        type="text"
-                        placeholder="Total Currency"
-                        value={vc.currency}
-                        setValue={(val) =>
-                            setVc({ ...vc, currency: val })
-                        }
-                    />
-                </div>
-                <div className="">
+    if (response?.success) {
+      toast.success("Venture Created Successfully");
+      console.log(response.data);
 
-                    <Input
-                        type="text"
-                        placeholder="Committed Capital Currency"
-                        value={vc.monthly_contribution}
-                        setValue={(val) =>
-                            setVc({ ...vc, monthly_contribution: val })
-                        }
-                    />
-                </div>
-                <div className="">
+      // const res = await createMembership({
+      //   vc_id: response.data._id,
+      //   role: "ADMIN",
+      // });
 
-                    <Input
-                        type="number"
-                        placeholder="Loan Interest Percentage"
-                        value={vc.loan_interest_percent}
-                        setValue={(val) =>
-                            setVc({ ...vc, loan_interest_percent: val })
-                        }
-                    />
-                </div>
-                <div className="">
+      // if (res?.success) {
+      //   toast.success(res?.message);
+      // }
 
+      setVc({
+        name: "",
+        monthly_emi: "",
+        interest_rate: "",
+        max_loan_amount: "",
+        start_date: "",
+        collection_date: "",
+        loan_repayment_percent: "",
+        created_by: "",
+      });
+      router.push("/profile");
+    } else {
+      toast.error(response?.message || "Failed to create venture");
+    }
+  };
 
-                    <Input
-                        type="number"
-                        placeholder="Max Loan Percentage"
-                        value={vc.max_loan_percent}
-                        setValue={(val) =>
-                            setVc({ ...vc, max_loan_percent: val })
-                        }
-                    />
-                </div>
+  return (
+    <div className="min-h-screen text-black sm:p-4 bg-background">
+      <div className=" bg-background sm:bg-white w-full rounded-lg p-2 space-y-4 max-w-2xl mx-auto">
+        <h2 className="text-xl font-semibold border-b pb-2 pt-2">
+          Create New Venture
+        </h2>
 
-                {/* MEMBERS */}
-                {/* <div className="space-y-4">
-                        <div className="flex justify-between items-center">
-                            <h3 className="font-semibold">Members</h3>
-                            <button
-                                onClick={addMember}
-                                className="bg-gray-900 text-white px-3 py-1 rounded"
-                            >
-                                Add Member
-                            </button>
-                        </div>
+        {/* Name */}
+        <div className="space-y-4">
+          <div>
+            <Input
+              type="text"
+              placeholder="Venture Name"
+              value={vc.name}
+              setValue={(val) => setVc({ ...vc, name: val })}
+            />
+          </div>
 
-                        {members.map((member, index) => (
-                            <div
-                                key={index}
-                                className="border rounded-md p-4 space-y-3 bg-gray-50"
-                            >
-                                <div className="flex justify-between items-center">
-                                    <span className="font-medium">
-                                        Member {index + 1}
-                                    </span>
-                                    <button
-                                        onClick={() => removeMember(index)}
-                                        className="text-red-600 text-sm"
-                                    >
-                                        Delete
-                                    </button>
-                                </div>
-
-                                <Input
-                                    type="text"
-                                    placeholder="Name"
-                                    value={member.name}
-                                    setValue={(val) =>
-                                        updateMember(index, "name", val)
-                                    }
-                                />
-
-                                <Input
-                                    type="text"
-                                    placeholder="Email"
-                                    value={member.email}
-                                    setValue={(val) =>
-                                        updateMember(index, "email", val)
-                                    }
-                                />
-
-                                <Input
-                                    type="text"
-                                    placeholder="Phone Number"
-                                    value={member.phoneNumber}
-                                    setValue={(val) =>
-                                        updateMember(index, "phoneNumber", val)
-                                    }
-                                />
-
-                                <select
-                                    value={member.role}
-                                    onChange={(e) =>
-                                        updateMember(index, "role", e.target.value)
-                                    }
-                                    className="w-full border rounded px-3 py-2"
-                                >
-                                    <option value="partner">Partner</option>
-                                    <option value="admin">Admin</option>
-                                    <option value="investor">Investor</option>
-                                </select>
-                            </div>
-                        ))}
-                    </div> */}
-
-                {/* SUBMIT */}
-                <button
-                    onClick={submitHandler}
-                    className="w-full bg-blue-600 text-white py-2 rounded-md"
-                >
-                    Submit
-                </button>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Input
+                type="number"
+                placeholder="Monthly EMI Amount"
+                value={vc.monthly_emi}
+                setValue={(val) => setVc({ ...vc, monthly_emi: val })}
+              />
             </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Input
+                type="number"
+                placeholder="Interest Rate (%)"
+                value={vc.interest_rate}
+                setValue={(val) => setVc({ ...vc, interest_rate: val })}
+              />
+            </div>
+            <div>
+              <Input
+                type="number"
+                placeholder="Max Loan Amount"
+                value={vc.max_loan_amount}
+                setValue={(val) => setVc({ ...vc, max_loan_amount: val })}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="text-sm font-medium text-gray-700">
+                Start Date
+              </label>
+              <Input
+                type="date"
+                placeholder=""
+                value={vc.start_date}
+                setValue={(val) => setVc({ ...vc, start_date: val })}
+              />
+            </div>
+            <div>
+              <Input
+                type="number"
+                placeholder="monthly occurance date"
+                // placeholder="Collection Date (Day 1-31)"
+                value={vc.collection_date}
+                setValue={(val) => setVc({ ...vc, collection_date: val })}
+              />
+            </div>
+          </div>
+
+          <div>
+            <Input
+              type="number"
+              placeholder="Fixed Monthly Loan Repayment (%)"
+              value={vc.loan_repayment_percent}
+              setValue={(val) => setVc({ ...vc, loan_repayment_percent: val })}
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Percentage of principal to be repaid monthly
+            </p>
+          </div>
         </div>
-    );
+
+        {/* SUBMIT */}
+        <div className="pt-4">
+          <button
+            onClick={submitHandler}
+            className="w-full bg-indigo-600 hover:bg-indigo-700 transition-colors text-white py-3 rounded-lg font-semibold"
+          >
+            Create Venture
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Page;
+
+// Force TS update

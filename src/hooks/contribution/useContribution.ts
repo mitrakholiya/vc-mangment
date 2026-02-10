@@ -13,7 +13,7 @@ export interface ContributionData {
   amount: number;
   month: number;
   year: number;
-  status: "PAID" | "PENDING";
+  status: "paid" | "pending" | "none" | "approved";
   paid_at?: string;
 }
 
@@ -23,33 +23,86 @@ export interface GetContributionsResponse {
 }
 
 // API Functions
-export const addContribution = async (vc_id: string) => {
-  const res = await api.put("/venture/add-contribution", { vc_id });
+
+const reqestTopanding = async (id: string) => {
+  const res = await api.put("/venture/request-to-pending", { vc_id: id });
   return res.data;
 };
 
-export const getContributions = async (
-  vc_id?: string,
-): Promise<GetContributionsResponse> => {
-  const params = vc_id ? `?vc_id=${vc_id}` : "";
-  const res = await api.get(`/venture/add-contribution${params}`);
+const getReqestTopanding = async (vc_id: string) => {
+  const res = await api.get("/venture/request-to-pending", {
+    params: { vc_id },
+  });
   return res.data;
 };
 
-// Hooks
-const useAddcontribution = (vc_id: string) => {
+// Admin Direct Approvel
 
+// ---------------------------------------------------------------------
 
+const putDirectApprove = async ({
+  id,
+  part_payment,
+}: {
+  id: string;
+  part_payment?: number;
+}) => {
+  const res = await api.put("/admin/approve-contribution", {
+    id,
+    part_payment,
+  });
+  return res.data;
+};
+
+export const usePutDirectApprove = () => {
   return useMutation({
-    mutationFn: () => addContribution(vc_id),
+    mutationFn: (data: { id: string; part_payment?: number }) =>
+      putDirectApprove(data),
   });
 };
 
-export const useGetContributions = (vc_id?: string) => {
+// ---------------------------------------------------------------------
+
+// Admin Loan Distribution
+
+const putLoanDistribution = async (loan: any, id: string) => {
+  const res = await api.post("/admin/loan", { loan, vc_id: id });
+  return res.data;
+};
+
+export const usePutLoanDistribution = () => {
+  return useMutation({
+    mutationFn: ({ loan, id }: { loan: any; id: string }) =>
+      putLoanDistribution(loan, id),
+  });
+};
+
+// ---------------------------------------------------------------------
+
+const getVcMonthly = async (id: string) => {
+  const res = await api.get(`/admin/vc-monthly`, {
+    params: { vc_id: id },
+  });
+  return res.data;
+};
+
+export const useGetVcMonthly = (id: string) => {
   return useQuery({
-    queryKey: ["contributions", vc_id],
-    queryFn: () => getContributions(vc_id),
+    queryKey: ["get-vc-monthly", id],
+    queryFn: () => getVcMonthly(id),
+    enabled: !!id,
   });
 };
 
-export default useAddcontribution;
+export const useGetReqestTopanding = (vc_id: string) => {
+  return useQuery({
+    queryKey: ["reqest-to-pending", vc_id],
+    queryFn: () => getReqestTopanding(vc_id),
+  });
+};
+
+export const useRequestToPending = (id: string) => {
+  return useMutation({
+    mutationFn: () => reqestTopanding(id),
+  });
+};

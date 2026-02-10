@@ -1,13 +1,9 @@
-export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { dbConnect } from "@/db.config/dbconnection";
-import VcMembershipModel from "@/models/vc-membership.model";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
 import VentureModel from "@/models/venture.model";
-import MonthlyContributionModel, {
-  ContributionStatus,
-} from "@/models/monthly-contribution.model";
+
 import mongoose from "mongoose";
 
 interface CustomJwtPayload extends jwt.JwtPayload {
@@ -42,50 +38,46 @@ export async function GET(
       process.env.JWT_SECRET!,
     ) as CustomJwtPayload;
 
-    await dbConnect();
-
-    const isExist = await VcMembershipModel.findOne({
-      vc_id: id,
-      user_id: decoded.userId,
-    });
-    if (isExist) {
-      return NextResponse.json(
-        { success: false, message: "You are already a member" },
-        { status: 200 },
-      );
-    }
-    const membership = await VcMembershipModel.create({
-      vc_id: id,
-      user_id: decoded.userId,
-    });
-
-    const isMonthlyContributionExist = await MonthlyContributionModel.findOne({
-      vc_id: id,
-      user_id: decoded.userId,
-    });
-    if (isMonthlyContributionExist) {
-      return NextResponse.json(
-        { success: false, message: "You are already a member" },
-        { status: 200 },
-      );
-    }
     const venture = await VentureModel.findById(id);
-
-    if (venture?.monthly_contribution) {
-      await MonthlyContributionModel.create({
-        vc_id: id,
-        user_id: decoded.userId,
-        amount: venture.monthly_contribution,
-        month: new Date().getMonth() + 1, // ✅ 1–12
-        year: new Date().getFullYear(),
-        status: ContributionStatus.PENDING,
-      });
+    if (!venture) {
+      return NextResponse.json(
+        { success: false, message: "Venture not found" },
+        { status: 404 },
+      );
     }
+
+    // Check if user is already a member
+    const isMember = venture.members?.some(
+      (member: any) => member.user_id.toString() === decoded.userId,
+    );
+
+    if (isMember) {
+      return NextResponse.json(
+        { success: false, message: "You are already a member" },
+        { status: 200 },
+      );
+    }
+
+    // Check if request already exists
+    const isRequested = venture.requests?.some(
+      (requestId: any) => requestId.toString() === decoded.userId,
+    );
+
+    if (isRequested) {
+      return NextResponse.json(
+        { success: false, message: "Request already sent" },
+        { status: 200 },
+      );
+    }
+
+    // Add request
+    await VentureModel.findByIdAndUpdate(id, {
+      $addToSet: { requests: decoded.userId },
+    });
 
     return NextResponse.json({
       success: true,
-      message: "VC Created Successfully",
-      data: membership,
+      message: "Request sent successfully",
     });
   } catch (err) {
     console.error("Server Error:", err);

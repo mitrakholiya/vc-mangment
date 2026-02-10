@@ -1,0 +1,20 @@
+vc model
+
+name
+Monthly EMI
+intrest rate
+Starting date
+monthly occurance date
+Max loan amount in number
+Fixed Monthly Loan Repayment percentage 
+Members: []
+Requests: []
+
+
+
+
+vcmember array
+id
+vc_id
+[reqested member]
+[member]

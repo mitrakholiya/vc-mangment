@@ -1,49 +1,36 @@
 "use client";
 
-import useAddcontribution, {
-  useGetContributions,
-} from "@/hooks/contribution/useContribution";
-import {
-  useGetLoanByUserIdAndVentureId,
-  useGetLoansByVentureId,
-} from "@/hooks/loan/useLoan";
-import {
-  Card,
-  CardContent,
-  Typography,
-  Divider,
-  Chip,
-  CircularProgress,
-} from "@mui/material";
+import { Card, CardContent, Divider } from "@mui/material";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import toast from "react-hot-toast";
-import UserPersonalLoan from "./UserPersonalLoan";
+import JoinRequestsPopup from "./JoinRequestsPopup";
+import TakeLoanModal from "./TakeLoanModal";
+import { useUpdateVentureStatus } from "@/hooks/venture/useVenture";
+import { useTakeLoan } from "@/hooks/useTakeLoan";
+import PlanCardHeader from "./plan-card/PlanCardHeader";
+import PlanCardDetails from "./plan-card/PlanCardDetails";
+import PlanCardContributions from "./plan-card/PlanCardContributions";
+import PlanCardFooter from "./plan-card/PlanCardFooter";
 
 type Plan = {
   _id: string;
   name: string;
-  currency: string;
-  fund_wallet: number;
-  monthly_contribution: number;
-  loan_interest_percent: number;
-  max_loan_percent: number;
-  created_by: string;
-  created_at: string;
-  updated_at: string;
-};
+  monthly_emi: number; // Was monthly_contribution
+  interest_rate: number; // Was loan_interest_percent
+  start_date: Date;
+  collection_date: number; // Monthly occurrence date (1-31)
+  max_loan_amount: number; // Was max_loan_percent, now fixed amount
+  loan_repayment_percent: number; // Fixed Monthly Loan Repayment percentage
+  members: string[]; // Array of strings (User IDs)
+  requests: any[]; // Array of populated user objects
 
-type LoanData = {
-  _id: string;
-  vc_id: string;
-  user_id: string;
-  principal: number;
-  interest_rate: number;
-  months: number;
+  // System fields kept for compatibility/logic
+  created_at: Date;
+  updated_at: Date;
+  created_by: string;
+  fund_wallet: number;
   status: string;
-  approve_status: string;
-  created_at: string;
-  closed_at?: string;
 };
 
 export default function PlanCard({
@@ -57,208 +44,164 @@ export default function PlanCard({
 }) {
   // View page
   const [open, setOpen] = useState<string | undefined>(view);
-  const { mutateAsync: addContribution } = useAddcontribution(data._id);
-  const {
-    data: loans,
-    isLoading: isLoadingLoans,
-    refetch: refetchLoans,
-  } = useGetLoanByUserIdAndVentureId(data._id);
-  const [loanData, setLoanData] = useState<LoanData | null>(null);
-  useEffect(() => {
-    setLoanData(loans?.data);
-  }, [loans]);
+  // Requests Popup
+  const [popup, setPopup] = useState(false);
+  // Take Loan Modal
+  const [loanModal, setLoanModal] = useState(false);
+  // Update VC Status
+  const { mutateAsync: updateVentureStatus } = useUpdateVentureStatus();
+  // Add Contribution
+  // const { mutateAsync: addContribution } = useAddcontribution(data._id);
+  // Take Loan
+  const { mutateAsync: takeLoan, isPending: isTakingLoan } = useTakeLoan();
   // Router
   const router = useRouter();
 
   // View page
-  const {
-    data: contributionsData,
-    isLoading: isLoadingContributions,
-    refetch: refetchContributions,
-  } = useGetContributions(data._id);
+  
+  const [status, setStatus] = useState(data.status);
+
+  const handelStatus = async () => {
+    if (status === "active") {
+      if (!window.confirm("Are you sure you want to inactive this venture?")) {
+        return;
+      }
+    }
+
+    try {
+      const newStatus = status === "active" ? "inactive" : "active";
+      const res = await updateVentureStatus({
+        vc_id: data._id,
+        status: newStatus,
+      });
+      if (res?.success) {
+        toast.success(res?.message);
+        setStatus(newStatus);
+        setOpen(undefined);
+      } else {
+        toast.error(res?.message);
+      }
+    } catch (error) {
+      console.error("Error updating venture status:", error);
+    }
+  };
 
   // View page
   // Monthly Contribution Handler
-  const handleAddContribution = async () => {
+  // const handleAddContribution = async () => {
+  //   try {
+  //     const res = await addContribution();
+  //     console.log(res);
+
+  //     if (res.success) {
+  //       toast.success(res.message);
+  //       refetchContributions(); // Refetch contributions after adding
+  //       setOpen(undefined);
+  //     } else {
+  //       toast.error(res.message);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error adding contribution:", error);
+  //   }
+  // };
+
+  // Take Loan Handler
+  const handleTakeLoan = async (amount: number) => {
     try {
-      const res = await addContribution();
-      console.log(res);
+      const res = await takeLoan({
+        vc_id: data._id,
+        loan_amount: amount,
+      });
 
       if (res.success) {
         toast.success(res.message);
-        refetchContributions(); // Refetch contributions after adding
-        setOpen(undefined);
+        // Optionally refetch data here
       } else {
         toast.error(res.message);
       }
-    } catch (error) {
-      console.error("Error adding contribution:", error);
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to take loan");
     }
   };
-  // View page
-  // Loan Handler
-  const GetLoanHandler = () => {
-    try {
-      router.push(`/profile/get-loan?vc_id=${data._id}`);
-    } catch (error) {}
-  };
-
-  // Admin
-  // View Loan Handler For Admin
-  const ViewLoanHandler = () => {
-    try {
-      router.push(`/profile/view-loan?vc_id=${data._id}`);
-    } catch (error) {}
-  };
-
 
   // User Pay Emi
 
- 
-  
   return (
     <Card className="w-full shadow-lg rounded-xl">
       <CardContent className="space-y-3 p-4 sm:p-6">
         {/* Header */}
-        <div className="flex items-center justify-between gap-1">
-          <Typography
-            variant="h6"
-            fontWeight={600}
-            className="text-base sm:text-lg"
-          >
-            {data.name.toUpperCase()}
-          </Typography>
-          <Chip
-            label={`${data.max_loan_percent}% Loan`}
-            color="primary"
-            size="small"
-          />
-        </div>
+        <PlanCardHeader
+          name={data.name}
+          requestsCount={data.requests?.length || 0}
+          isAdmin={isAdmin ?? false}
+          status={status}
+          maxLoanAmount={data.max_loan_amount}
+          onRequestsClick={() => setPopup(true)}
+          onStatusToggle={handelStatus}
+        />
 
         <Divider />
 
         {/* Details */}
-        <div className="space-y-1 text-sm ">
-          <p>
-            <span className="font-medium">Currency Value:</span> ₹
-            {data.currency}
-          </p>
-
-          <p>
-            <span className="font-medium">Monthly Contribution:</span> ₹
-            {data.monthly_contribution}
-          </p>
-
-          <p>
-            <span className="font-medium">Loan Interest:</span>{" "}
-            {data.loan_interest_percent}%
-          </p>
-
-          <p>
-            <span className="font-medium">Wallet Balance:</span>{" "}
-            {data.fund_wallet}
-          </p>
-          <p className="break-all">
-            <span className="font-medium">VC ID:</span>{" "}
-            <span className="text-xs sm:text-sm">{data._id}</span>
-          </p>
-        </div>
+        <PlanCardDetails
+          monthlyEmi={data.monthly_emi}
+          interestRate={data.interest_rate}
+          fundWallet={data.fund_wallet}
+          ventureId={data._id}
+        />
 
         <Divider />
 
-        {/* My Loan Status */}
-       <UserPersonalLoan loanData={loanData} isLoadingLoans={isLoadingLoans} />
+     
 
         <Divider />
 
-        <div className="space-y-2">
-          <Typography variant="subtitle2" fontWeight={600}>
-            My Contribution Status
-          </Typography>
-          {isLoadingContributions ? (
-            <div className="flex justify-center py-2">
-              <CircularProgress size={20} />
-            </div>
-          ) : contributionsData?.data && contributionsData.data.length > 0 ? (
-            <div className="space-y-1 text-sm">
-              {contributionsData.data.map((contribution) => (
-                <div
-                  key={contribution._id}
-                  className="flex flex-wrap items-center justify-between gap-2 bg-gray-50 p-2 sm:p-3 rounded"
-                >
-                  <span className="text-xs sm:text-sm">
-                    {contribution.month}/{contribution.year}
-                  </span>
-                  <span className="text-xs sm:text-sm">
-                    ₹{contribution.amount}
-                  </span>
-                  <Chip
-                    label={contribution.status}
-                    color={
-                      contribution.status === "PAID" ? "success" : "warning"
-                    }
-                    size="small"
-                  />
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-sm text-gray-500">No contributions yet</p>
-          )}
-        </div>
-
-        <Divider />
-
-        {/* THis is For View Page */}
+        {/* Take Loan Button for View Page */}
         {open !== undefined && (
-          <div className="text-sm py-3 border-b border-gray-200">
+          <div className="text-sm py-3">
             <button
-              onClick={GetLoanHandler}
-              className="w-full sm:w-auto bg-indigo-600 text-white hover:bg-indigo-700 active:scale-[0.98] px-4 py-3 sm:py-2 rounded-lg font-medium transition-all"
+              onClick={() => setLoanModal(true)}
+              className="w-full sm:w-auto bg-secondary text-white hover:bg-secondary/90 active:scale-[0.98] px-4 py-3 sm:py-2 rounded-lg font-medium transition-all"
             >
-              Get Loan
+              Take Loan
             </button>
           </div>
         )}
 
-        {/* Footer */}
+        <Divider />
 
-        <div className="text-xs text-gray-500 space-y-3 sm:space-y-1 flex flex-col sm:flex-row sm:justify-between py-2">
-          <div className="space-y-0.5">
-            <p>
-              <strong>Created:</strong>{" "}
-              {new Date(data.created_at).toLocaleDateString()}
-            </p>
-            <p>
-              <strong>Updated:</strong>{" "}
-              {new Date(data.updated_at).toLocaleDateString()}
-            </p>
-          </div>
+        {/* Footer
+        <PlanCardFooter
+          createdAt={data.created_at}
+          updatedAt={data.updated_at}
+          isAdmin={isAdmin}
+          showAddContribution={
+            open !== undefined &&
+            !contributionsData?.data?.some((c: any) => c.status === "PAID")
+          }
+          onAddContribution={handleAddContribution}
+        /> */}
 
-          {open !== undefined &&
-            !contributionsData?.data?.some((c) => c.status === "PAID") && (
-              <div className="text-sm mt-2 sm:mt-0">
-                <button
-                  onClick={handleAddContribution}
-                  className="w-full sm:w-auto bg-indigo-600 text-white hover:bg-indigo-700 active:scale-[0.98] px-4 py-3 sm:py-2 rounded-lg font-medium transition-all"
-                >
-                  Add Contribution
-                </button>
-              </div>
-            )}
+        {/* Requests Modal */}
+        <JoinRequestsPopup
+          open={popup}
+          onClose={() => setPopup(false)}
+          requests={data.requests}
+          ventureId={data._id}
+        />
 
-          {/* THis is For Admin Page */}
-          {isAdmin && (
-            <div className="text-sm mt-2 sm:mt-0">
-              <button
-                onClick={ViewLoanHandler}
-                className="w-full sm:w-auto bg-indigo-600 text-white hover:bg-indigo-700 active:scale-[0.98] px-4 py-3 sm:py-2 rounded-lg font-medium transition-all"
-              >
-                View Loan Reqestes
-              </button>
-            </div>
-          )}
-        </div>
+        {/* Take Loan Modal */}
+        <TakeLoanModal
+          open={loanModal}
+          onClose={() => setLoanModal(false)}
+          vcId={data._id}
+          maxLoanAmount={data.max_loan_amount}
+          fundWallet={data.fund_wallet}
+          interestRate={data.interest_rate}
+          loanRepaymentPercent={data.loan_repayment_percent}
+          onTakeLoan={handleTakeLoan}
+          isLoading={isTakingLoan}
+        />
       </CardContent>
     </Card>
   );

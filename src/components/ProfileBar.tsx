@@ -42,7 +42,7 @@ const ProfileBar = () => {
           <div className="ml-auto">
             <Link
               href="/logout"
-              className="text-white bg-secondary px-4 py-2 text-sm font-semibold rounded-full"
+              className="text-gray-700 bg-white border border-gray-300 px-4 py-2 text-sm font-semibold rounded-full hover:bg-gray-50 transition-colors"
             >
               Logout
             </Link>

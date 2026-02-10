@@ -15,7 +15,7 @@ const Nav = () => {
   return (
     <>
       {/* Mobile Navbar */}
-      <div className="flex items-center gap-3 px-4 py-3 bg-primary text-white">
+      <div className="flex items-center gap-3 px-4 py-3 bg-primary/20 text-white">
         <button
           onClick={() => setIsOpen(true)}
           className="text-2xl"
@@ -27,7 +27,7 @@ const Nav = () => {
           <h1 className="text-lg font-semibold">VC Management</h1>
           <Link
             href="/logout"
-            className="text-white bg-secondary px-4 py-2 rounded"
+            className="text-gray-700 bg-white border border-gray-300 px-4 py-2 rounded hover:bg-gray-50 transition-colors"
           >
             Logout
           </Link>

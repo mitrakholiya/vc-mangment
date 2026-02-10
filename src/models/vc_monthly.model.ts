@@ -12,6 +12,7 @@ export interface IVcMonthly extends Document {
   total_loan_repayment: number;
   total_part_payment: number;
   total: number;
+  total_loan_vyaj: number;
   loans: IVcMonthlyLoan[];
   remaining_amount: number;
   month: number;
@@ -62,6 +63,11 @@ const VcMonthlySchema = new Schema<IVcMonthly>(
       required: true,
       default: 0,
     },
+    total_loan_vyaj: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
     total: {
       type: Number,
       required: true,
@@ -100,11 +106,12 @@ VcMonthlySchema.index({ vc_id: 1, month: 1, year: 1 }, { unique: true });
 
 // Pre-save hook to calculate total and remaining_amount
 VcMonthlySchema.pre("save", async function (this: IVcMonthly) {
-  // Calculate total from the four fields
+  // Calculate total from the five fields
   this.total =
     this.last_month_remaining_amount +
     this.total_monthly_contribution +
     this.total_loan_repayment +
+    this.total_loan_vyaj +
     this.total_part_payment;
 
   // Calculate total loans

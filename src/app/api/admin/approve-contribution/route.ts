@@ -105,9 +105,13 @@ export async function PUT(req: Request) {
     await contribution.save();
 
     // ✅ Add contribution to Venture Wallet
-    // Wallet += Monthly Contribution + EMI + Part Payment
+    // Wallet += Monthly Contribution + EMI + Part Payment + Interest
+    const interestPaid = contribution.loan_interest || 0;
     const totalToWallet =
-      (contribution.monthly_contribution || 0) + emiPaid + partPaymentVal;
+      (contribution.monthly_contribution || 0) +
+      emiPaid +
+      partPaymentVal +
+      interestPaid;
     venture.fund_wallet = (venture.fund_wallet || 0) + totalToWallet;
 
     await venture.save();
@@ -132,6 +136,9 @@ export async function PUT(req: Request) {
 
       vcMonthly.total_part_payment =
         (vcMonthly.total_part_payment || 0) + partPaymentVal;
+
+      vcMonthly.total_loan_vyaj =
+        (vcMonthly.total_loan_vyaj || 0) + interestPaid;
 
       await vcMonthly.save();
     } else {

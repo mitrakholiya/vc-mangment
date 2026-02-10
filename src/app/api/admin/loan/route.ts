@@ -42,7 +42,7 @@ export async function POST(req: Request) {
 
     const { loan, vc_id } = await req.json();
 
-    console.log(loan);
+    // console.log(loan);
 
     // ✅ Validate input
     if (!loan) {
@@ -118,13 +118,16 @@ export async function POST(req: Request) {
       });
 
       const interest = (amount * venture.interest_rate) / 100;
-      const emi = interest + (amount * venture.loan_repayment_percent) / 100;
+      const emi = (amount * venture.loan_repayment_percent) / 100;
 
       if (!nextMonthRecord) {
         // Create new record for next month
         // Balance = Current Remaining + New Loan Amount
         const openingBalance = userMonthlyRecord.remaining_loan || 0;
         const newBalance = openingBalance + amount;
+
+        const newInterest = (newBalance * venture.interest_rate) / 100;
+        const newEmi = (newBalance * venture.loan_repayment_percent) / 100;
 
         nextMonthRecord = new VcUserMonthlyModel({
           vc_id: userMonthlyRecord.vc_id,
@@ -133,11 +136,12 @@ export async function POST(req: Request) {
           year: nextYear,
           monthly_contribution: userMonthlyRecord.monthly_contribution,
           loan_amount: newBalance, // Set total outstanding for next month
-          loan_interest: interest,
-          loan_monthly_emi: emi,
+          loan_interest: newInterest,
+          loan_monthly_emi: newEmi,
 
           remaining_loan: newBalance, // Set total outstanding
-          total_payable: userMonthlyRecord.monthly_contribution + emi,
+          total_payable:
+            userMonthlyRecord.monthly_contribution + newEmi + newInterest,
           status: "none",
         });
       } else {
@@ -153,7 +157,7 @@ export async function POST(req: Request) {
         nextMonthRecord.loan_monthly_emi =
           (nextMonthRecord.loan_monthly_emi || 0) + emi;
         nextMonthRecord.total_payable =
-          (nextMonthRecord.total_payable || 0) + emi;
+          (nextMonthRecord.total_payable || 0) + emi + interest;
       }
 
       await nextMonthRecord.save();
@@ -191,6 +195,7 @@ export async function POST(req: Request) {
         total_monthly_contribution: 0,
         total_loan_repayment: 0,
         total_part_payment: 0,
+        total_loan_vyaj: 0,
         loans: [],
       });
     }
@@ -238,6 +243,11 @@ export async function POST(req: Request) {
     vcMonthly.total_loan_repayment = allUserRecords
       .filter((r: any) => r.status === "approved" || r.status === "paid")
       .reduce((sum: number, r: any) => sum + (r.loan_monthly_emi || 0), 0);
+
+    // Calculate total loan interest (Interest paid)
+    vcMonthly.total_loan_vyaj = allUserRecords
+      .filter((r: any) => r.status === "approved" || r.status === "paid")
+      .reduce((sum: number, r: any) => sum + (r.loan_interest || 0), 0);
 
     // Save VcMonthly (pre-save hook will calculate total and remaining_amount)
     await vcMonthly.save();

@@ -2,6 +2,7 @@
 import React, { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import axios from 'axios'
+import { CircularProgress } from '@mui/material'
 
 const Logout = () => {
     const router = useRouter()
@@ -16,8 +17,8 @@ const Logout = () => {
     }, [])
 
     return (
-        <div>
-            Loding...
+        <div className='h-screen w-full flex justify-center items-center'>
+            <CircularProgress />    
         </div>
     )
 }

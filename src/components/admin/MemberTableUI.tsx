@@ -148,7 +148,7 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
 
   if (isError) {
     return (
-      <div className="text-center text-red-500 py-4">
+      <div className="text-center text-gray-700 font-bold py-4">
         Error: {(error as Error).message}
       </div>
     );
@@ -205,10 +205,10 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
       } else {
         toast.error(res?.message || "Something Went Wrong");
       }
-    }else{
-    setApproveSelectedId(id);
-    setPartPaymentInput("");
-    setIsApproveDialogOpen(true);
+    } else {
+      setApproveSelectedId(id);
+      setPartPaymentInput("");
+      setIsApproveDialogOpen(true);
     }
   };
 
@@ -239,12 +239,12 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
 
   return (
     <div className="mt-4">
-      <Typography className="text-sm mb-2 font-extrabold px-1">
+      <Typography className="text-sm mb-2 font-extrabold px-1 text-gray-700 text-center">
         {monthName} {year}
       </Typography>
       <TableContainer
         component={Paper}
-        className="shadow-md rounded-lg text-[8px]"
+        className="shadow-md rounded-lg text-[8px] my-[10px]"
         // sx={{ overflow: "hidden" }}
       >
         <Table
@@ -263,28 +263,28 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
               <TableCell sx={{ width: "25px", p: "2px" }}>
                 <strong>No.</strong>
               </TableCell>
-              <TableCell sx={{ width: "80px", p: "2px" }}>
+              <TableCell sx={{ width: "120px", p: "2px" }}>
                 <strong>Name</strong>
               </TableCell>
-              <TableCell align="right" sx={{ width: "50px", p: "2px" }}>
+              <TableCell align="center" sx={{ width: "50px", p: "2px" }}>
                 <strong>Monthly hapto</strong>
               </TableCell>
-              <TableCell align="right" sx={{ width: "60px", p: "2px" }}>
+              <TableCell align="center" sx={{ width: "60px", p: "2px" }}>
                 <strong>Loan</strong>
               </TableCell>
-              <TableCell align="right" sx={{ width: "50px", p: "2px" }}>
+              <TableCell align="center" sx={{ width: "50px", p: "2px" }}>
                 <strong>Part Payment </strong>
               </TableCell>
-              <TableCell align="right" sx={{ width: "50px", p: "2px" }}>
+              <TableCell align="center" sx={{ width: "50px", p: "2px" }}>
                 <strong>Remaining Loan</strong>
               </TableCell>
-              <TableCell align="right" sx={{ width: "50px", p: "2px" }}>
+              <TableCell align="center" sx={{ width: "50px", p: "2px" }}>
+                <strong>Loan Hapto</strong>
+              </TableCell>
+              <TableCell align="center" sx={{ width: "50px", p: "2px" }}>
                 <strong>Loan Interest</strong>
               </TableCell>
-              <TableCell align="right" sx={{ width: "50px", p: "2px" }}>
-                <strong>Loan EMI</strong>
-              </TableCell>
-              <TableCell align="right" sx={{ width: "60px", p: "2px" }}>
+              <TableCell align="center" sx={{ width: "60px", p: "2px" }}>
                 <strong>Total</strong>
               </TableCell>
               <TableCell align="center" sx={{ width: "80px", p: "2px" }}>
@@ -304,10 +304,11 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
                 </TableCell>
                 <TableCell
                   sx={{
-                    maxWidth: "80px",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
+                    maxWidth: "150px", // Increased from 80px
+                    minWidth: "100px",
+                    lineHeight: "1.2",
+                    // fontSize: "0.75rem",
+                    fontWeight: 500,
                   }}
                 >
                   {row.user_id?.name || "Unknown"}
@@ -575,7 +576,7 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
                       </span>
                     }
                   />
-                  <span className="text-blue-600 text-xs font-bold">
+                  <span className="text-gray-700 underline text-xs font-bold">
                     Select
                   </span>
                 </ListItemButton>
@@ -605,7 +606,7 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
 
               <div className="flex justify-between text-sm font-bold border-t pt-3 mt-2 text-gray-800">
                 <span>Total Loan:</span>
-                <span className="text-green-600 text-lg">
+                <span className="text-gray-700 text-lg">
                   ₹
                   {(
                     (selectedUserForLoan.remaining_loan || 0) +

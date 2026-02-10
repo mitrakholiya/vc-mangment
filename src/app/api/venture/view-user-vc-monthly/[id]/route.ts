@@ -24,7 +24,12 @@ export async function GET(
     await dbConnect();
     const { id } = await context.params;
 
-    const vc = await VentureModel.findById(id);
+    const vc = await VentureModel.findById(id).populate({
+      path: "requests",
+      model: "User",
+      select: "name email phone",
+    });
+
     if (vc === null) {
       return NextResponse.json({
         success: false,

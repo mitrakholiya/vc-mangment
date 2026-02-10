@@ -20,7 +20,7 @@ const page = () => {
     : (params?.id ?? "");
   const { data: user } = useGetUser();
   const userId = user?.userId; // Adjust this based on actual API response structure (e.g., user?._id or user?.id)
-// Admin
+  // Admin
   const { data, isLoading, isError, error } = useViewVentureQuery();
 
   const {
@@ -62,7 +62,7 @@ const page = () => {
         <div className="grid grid-cols-2 gap-2 mb-[20px] px-[10px]">
           <button
             onClick={() => setActive(true)}
-            className={` text-white py-1 px-4 text-sm  rounded-lg flex items-center gap-2 ${active ? "bg-secondary/50" : "bg-secondary"}`}
+            className={`py-1 px-4 text-sm rounded-lg flex items-center gap-2 border transition-colors ${active ? "bg-gray-900/80 text-white border-gray-900" : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"}`}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -87,7 +87,7 @@ const page = () => {
           </button>
           <button
             onClick={() => setActive(false)}
-            className={`text-white py-1 px-4 text-sm  rounded-lg flex items-center  gap-2 ${active ? "bg-secondary" : "bg-secondary/50"}`}
+            className={`py-1 px-4 text-sm rounded-lg flex items-center gap-2 border transition-colors ${!active ? "bg-gray-900/80 text-white border-gray-900" : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"}`}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

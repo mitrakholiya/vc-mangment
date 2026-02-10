@@ -87,6 +87,11 @@ export default function ViewVentureComponent({
     }
   };
 
+  const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success("Copied to clipboard");
+  };
+
   if (!data) return null;
 
   return (
@@ -98,9 +103,11 @@ export default function ViewVentureComponent({
           <div className="flex justify-between items-center">
             <div>
               <h2 className="text-lg font-semibold text-white">{data.name}</h2>
-              <h2 className="text-sm font-semibold text-white">{data.vc_id}</h2>
+              <h2 className="text-sm font-semibold text-white"
+              onClick = {()=>handleCopy(data?.vc_id)}
+              >{data.vc_id}</h2>
               {data.month && data.year && (
-                <p className="text-gray-200 text-xs">
+                <p className="text-gray-200 text-sm">
                   {getMonthName(data.month)} {data.year}
                 </p>
               )}
@@ -123,29 +130,29 @@ export default function ViewVentureComponent({
         {/* Content */}
         <div className="">
           {/* Unified Stats */}
-          <div className="bg-gray-50 rounded-lg p-2.5 space-y-1.5">
-            <div className="flex justify-between text-xs">
+          <div className="bg-gray-50 rounded-lg p-2.5 space-y-1.5 font-semibold">
+            <div className="flex justify-between text-sm">
               <span className="text-gray-500">Monthly Hapto</span>
               <span className="font-semibold text-gray-800">
                 ₹{data.monthly_hapto?.toLocaleString() || 0}
               </span>
             </div>
 
-            <div className="flex justify-between text-xs">
+              <div className="flex justify-between text-sm">
               <span className="text-gray-500">Loan Amount</span>
               <span className="font-semibold text-gray-800">
                 ₹{data.total_loan_amount?.toLocaleString() || 0}
               </span>
             </div>
 
-            <div className="flex justify-between text-xs">
+            <div className="flex justify-between text-sm">
               <span className="text-gray-500">Remaining Loan</span>
               <span className="font-semibold text-gray-800">
                 ₹{data.total_remaining_amount?.toLocaleString() || 0}
               </span>
             </div>
 
-            <div className="flex justify-between text-xs">
+            <div className="flex justify-between text-sm">
               <span className="text-gray-500">
                 Interest ({data.interest_rate}%)
               </span>
@@ -154,14 +161,14 @@ export default function ViewVentureComponent({
               </span>
             </div>
 
-            <div className="flex justify-between text-xs">
+            <div className="flex justify-between text-sm">
               <span className="text-gray-500">Total Repayment</span>
               <span className="font-semibold text-gray-800">
                 ₹{data.total_repayment_amount?.toLocaleString() || 0}
               </span>
             </div>
 
-            <div className="flex justify-between text-xs">
+            <div className="flex justify-between text-sm  ">
               <span className="text-gray-500">Part Payment</span>
               <span className="font-semibold text-gray-800">
                 ₹{data.loan_part_payment?.toLocaleString() || 0}
@@ -210,13 +217,13 @@ export default function ViewVentureComponent({
           )}
 
           {/* Pay Button */}
-          <button
+          {/* <button
             onClick={handleRequestToPending}
             disabled={isPending}
-            className="w-full bg-secondary text-white font-medium py-2.5 rounded-lg hover:bg-secondary/80 active:scale-[0.98] transition-all text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-gray-900 text-white font-medium py-2.5 rounded-lg hover:bg-gray-800 active:scale-[0.98] transition-all text-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isPending ? "Processing..." : "Pay Monthly Hapto"}
-          </button>
+          </button> */}
         </div>
         <JoinRequestsPopup
           open={reqpopup}

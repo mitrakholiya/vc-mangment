@@ -46,10 +46,10 @@ const VentureSchema: Schema = new Schema(
         },
       },
     ],
-    requests: [{ type: Schema.Types.ObjectId, ref: "user" }], // Assuming requests are from users to join?
+    requests: [{ type: Schema.Types.ObjectId, ref: "User" }], // Changed from "user" to "User"
 
     // Existing fields
-    created_by: { type: String, required: true, ref: "user" },
+    created_by: { type: String, required: true, ref: "User" },
     fund_wallet: { type: Number, required: true, default: 0 },
     status: {
       type: String,

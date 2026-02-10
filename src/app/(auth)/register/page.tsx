@@ -5,9 +5,11 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { Input } from "@/components/Input";
+import { CircularProgress } from "@mui/material";
 
 const Page = () => {
   const router = useRouter();
+  const [isLoading,setIsLoading] = useState(false);
 
   const [form, setForm] = useState({
     name: "",
@@ -27,13 +29,14 @@ const Page = () => {
       return;
     }
     try {
+      setIsLoading(true);
       const res = await axios.post("/api/register", {
         email,
         password,
         name,
         phone,
       });
-
+      setIsLoading(false);
       if (res?.data.success) {
         toast.success("Registration completed");
         router.push("/login");
@@ -42,10 +45,19 @@ const Page = () => {
       console.log(err);
       toast.error("Something went wrong");
     }
+    setIsLoading(false);
   };
 
+  if (isLoading) {
+return(<>
+<div className="h-screen w-full flex justify-center items-center">
+          <CircularProgress />
+</div>
+</>)
+  } 
+  
   return (
-    <div className="flex h-screen sm:items-center items-end justify-center sm:bg-background bg-secondary sm:px-4">
+    <div className="flex h-[100dvh] sm:items-center items-end justify-center sm:bg-background bg-secondary sm:px-4">
       <div className="w-full max-w-md rounded-[30px_30px_0_0] sm:rounded-xl bg-white p-8 shadow-lg border border-gray-100 text-gray-900">
         <div className="mb-8 text-center">
           <h2 className="text-2xl font-bold text-gray-900">Create Account</h2>

@@ -63,11 +63,11 @@ export const GET = async () => {
       message: "VC Viewed Successfully",
       data: ventures,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Server Error:", error);
 
     return NextResponse.json(
-      { success: false, message: "Server Error" },
+      { success: false, message: "Server Error", error: error.message },
       { status: 500 },
     );
   }

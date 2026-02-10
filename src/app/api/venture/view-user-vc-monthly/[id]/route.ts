@@ -105,11 +105,14 @@ export async function GET(
         requests,
       },
     });
-  } catch (error) {
-    return NextResponse.json({
-      success: false,
-      message: "Server Error",
-      error: error,
-    });
+  } catch (error: any) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Server Error",
+        error: error.message,
+      },
+      { status: 500 },
+    );
   }
 }

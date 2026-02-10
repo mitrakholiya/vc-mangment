@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
 import VentureModel from "@/models/venture.model";
+import "@/models/user.model"; // Ensure User model is registered
 
 interface CustomJwtPayload extends jwt.JwtPayload {
   userId: string;

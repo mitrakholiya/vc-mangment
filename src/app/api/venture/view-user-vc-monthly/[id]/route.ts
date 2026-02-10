@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import vc_user_monthly from "@/models/vc-user-monthly";
+import "@/models/user.model"; // Ensure User model is registered
 import mongoose from "mongoose";
 
 interface CustomJwtPayload extends jwt.JwtPayload {

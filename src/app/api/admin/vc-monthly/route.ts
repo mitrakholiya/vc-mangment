@@ -6,7 +6,7 @@ import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
 import VcUserMonthlyModel from "@/models/vc-user-monthly";
 import VcMonthlyModel from "@/models/vc_monthly.model";
-import UserModel from "@/models/user.model";
+import UserModel from "@/models/user.model"; // Ensure User model is registered
 
 interface CustomJwtPayload extends jwt.JwtPayload {
   userId: string;
@@ -66,7 +66,7 @@ export async function GET(req: Request) {
     const currentMonth = now.getMonth() + 1;
     const currentYear = now.getFullYear();
 
-    // STRICTLY exclude future data 
+    // STRICTLY exclude future data
     // Data not come of next month
     const dateQuery = {
       $or: [

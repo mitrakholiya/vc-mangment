@@ -22,16 +22,18 @@ export async function dbConnect() {
   }
 
   if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URL, {
-      bufferCommands: false,
-      family: 4, // Force IPv4 to avoid querySrv errors
-    }).then((mongoose) => mongoose);
+    cached.promise = mongoose
+      .connect(MONGODB_URL, {
+        bufferCommands: false,
+        serverSelectionTimeoutMS: 10000, // 10s timeout
+        socketTimeoutMS: 45000, // 45s socket timeout
+      })
+      .then((mongoose) => mongoose);
   }
 
   cached.conn = await cached.promise;
   return cached.conn;
 }
-
 
 // import mongoose from "mongoose";
 

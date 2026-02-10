@@ -79,6 +79,20 @@ export const usePutLoanDistribution = () => {
 
 // ---------------------------------------------------------------------
 
+const putLock = async (id: string) => {
+  const res = await api.put("/admin/lock", { id });
+  return res.data;
+};
+
+export const usePutLock = () => {
+  return useMutation({
+    mutationFn: (id: string) => putLock(id),
+  });
+};
+
+// ---------------------------------------------------------------------
+// ---------------------------------------------------------------------
+
 const getVcMonthly = async (id: string) => {
   const res = await api.get(`/admin/vc-monthly`, {
     params: { vc_id: id },
@@ -104,5 +118,35 @@ export const useGetReqestTopanding = (vc_id: string) => {
 export const useRequestToPending = (id: string) => {
   return useMutation({
     mutationFn: () => reqestTopanding(id),
+  });
+};
+
+const getNextMonthData = async (id: string) => {
+  const res = await api.get(`/admin/next-month-data`, {
+    params: { vc_id: id },
+  });
+  return res.data;
+};
+
+export const useGetNextMonthData = (id: string) => {
+  return useQuery({
+    queryKey: ["get-next-month-data", id],
+    queryFn: () => getNextMonthData(id),
+    enabled: !!id,
+  });
+};
+
+const getVcHistory = async (id: string) => {
+  const res = await api.get(`/admin/history`, {
+    params: { vc_id: id },
+  });
+  return res.data;
+};
+
+export const useGetVcHistory = (id: string) => {
+  return useQuery({
+    queryKey: ["get-vc-history", id],
+    queryFn: () => getVcHistory(id),
+    enabled: !!id,
   });
 };

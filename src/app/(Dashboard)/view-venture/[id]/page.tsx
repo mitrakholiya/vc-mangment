@@ -6,11 +6,12 @@ import {
   useViewVentureQuery,
 } from "@/hooks/membership/useViewVenture";
 import PlanCard from "@/components/PlanCard";
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, Button, Fab } from "@mui/material";
 import { useGetUser } from "@/hooks/user/useGetUser";
 import ViewVentureComponent from "@/components/ViewVentureComponent";
 // import ReqOfPanding from "@/components/admin/ReqOfPanding";
 import MemberTable from "@/components/admin/MemberTable";
+import Link from "next/link";
 
 const page = () => {
   const [active, setActive] = useState<boolean>(true);
@@ -83,7 +84,7 @@ const page = () => {
                 d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
               />
             </svg>
-            View Venture
+            Venture
           </button>
           <button
             onClick={() => setActive(false)}
@@ -108,7 +109,68 @@ const page = () => {
         </div>
       )}
 
-      {active && <ViewVentureComponent data={userVcMonthlyData as any} />}
+      {active && (
+        <>
+          {/* Desktop Button */}
+          <div className="hidden sm:flex justify-end mb-4 px-[10px]">
+            <Link href={`/view-venture/history/${vc_id}`} passHref>
+              <Button
+                variant="outlined"
+                color="primary"
+                size="small"
+                startIcon={
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-5 h-5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                    />
+                  </svg>
+                }
+              >
+                History
+              </Button>
+            </Link>
+          </div>
+
+          {/* Mobile FAB */}
+          <div className="fixed bottom-20 right-4 z-50 sm:hidden">
+            <Link href={`/view-venture/history/${vc_id}`} passHref>
+              <Fab
+                color="primary"
+                aria-label="history"
+                variant="extended"
+                size="medium"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-5 h-5 mr-2"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                  />
+                </svg>
+                History
+              </Fab>
+            </Link>
+          </div>
+
+          <ViewVentureComponent data={userVcMonthlyData as any} />
+        </>
+      )}
       {/* {isAdmin && active && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {filteredData?.map((item: any) => (

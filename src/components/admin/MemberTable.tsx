@@ -44,6 +44,8 @@ const MemberTable = ({ id }: { id: string }) => {
       onAddLoan={handleAddLoan}
       monthName={monthName}
       year={year}
+      vcMonthlyData={data?.data?.vc_monthly}
+      vcId={id}
     />
   );
 };

@@ -27,6 +27,11 @@ import {
   Fab,
 } from "@mui/material";
 import toast from "react-hot-toast";
+import {
+  useGetVcMonthly,
+  usePutLock,
+} from "@/hooks/contribution/useContribution";
+import NextMonthData from "./NextMonthData";
 
 interface VcUserMonthly {
   _id: string;
@@ -57,6 +62,8 @@ interface MemberTableUIProps {
   onAddLoan: (loan: any) => Promise<any>;
   monthName: string;
   year: number;
+  vcMonthlyData?: any[];
+  vcId: string;
 }
 
 const MemberTableUI: React.FC<MemberTableUIProps> = ({
@@ -69,9 +76,23 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
   onAddLoan,
   monthName,
   year,
+  vcMonthlyData = [],
+  vcId,
 }) => {
   // Local State for Dialogs
 
+  // Done State
+
+  const [done, setDone] = React.useState(vcMonthlyData?.[0]?.lock || false);
+
+  React.useEffect(() => {
+    if (vcMonthlyData && vcMonthlyData.length > 0) {
+      setDone(vcMonthlyData[0]?.lock || false);
+    }
+
+    if (done) {
+    }
+  }, [vcMonthlyData]);
   // New state for loan modal
   const [isLoanModalOpen, setIsLoanModalOpen] = React.useState(false);
   const [selectedUserForLoan, setSelectedUserForLoan] = React.useState<
@@ -85,6 +106,8 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
     string | null
   >(null);
   const [partPaymentInput, setPartPaymentInput] = React.useState("");
+
+  const { mutateAsync: onLock } = usePutLock();
 
   const handleOpenLoanDialog = () => {
     setIsLoanModalOpen(true);
@@ -119,22 +142,13 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
     }
   };
 
-  // Keep original for backward compatibility if needed, or remove if unused
-  //   const handleSubmitLoanDistribution = async () => {
-  //     const res = await loanDistribution({ loan: loanMap, id });
-  //     if (res?.success === true) {
-  //       toast.success(res?.message);
-  //       refetch();
-  //       setLoanMap({});
-  //     } else {
-  //       toast.error("Something Went Wrong");
-  //       refetch();
-  //     }
-  //   };
-
-  const compalated = userVcMonthlyData?.every(
+  let compalated = userVcMonthlyData?.every(
     (row: any) => row.status === "approved",
   );
+
+  if (done) {
+    compalated = false;
+  }
 
   //   const compalated = true;
 
@@ -232,6 +246,19 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
     } else {
       toast.error(res?.message || "Something Went Wrong");
       handleCloseApproveDialog();
+    }
+  };
+
+  // Handel Lock this month
+
+  const handleLock = async () => {
+    if (!vcMonthlyData[0]?._id) return;
+    const res = await onLock(vcMonthlyData[0]?._id);
+    if (res?.success === true) {
+      toast.success("Locked successfully");
+      refetch();
+    } else {
+      toast.error(res?.message || "Something Went Wrong");
     }
   };
 
@@ -651,6 +678,222 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
           )}
         </DialogActions>
       </Dialog>
+
+      <div className="py-[50px] flex justify-center">
+        {done ? (
+          <div className="w-full max-w-md px-[10px]">
+            {(() => {
+              // Find matching VC Monthly record
+              // Ensure correct type matching for month/year (string vs number)
+              const matchingVcMonthly = vcMonthlyData.find(
+                (m: any) =>
+                  m.month == userVcMonthlyData[0]?.month &&
+                  m.year == userVcMonthlyData[0]?.year,
+              );
+
+              if (!matchingVcMonthly) return null;
+
+              return (
+                <TableContainer
+                  component={Paper}
+                  className="shadow-md rounded-lg mb-8"
+                >
+                  <Table size="small">
+                    <TableHead className="bg-gray-300">
+                      <TableRow>
+                        <TableCell
+                          className="text-white font-bold"
+                          colSpan={2}
+                          align="center"
+                        >
+                          {monthName} Monthly Summary
+                        </TableCell>
+                      </TableRow>
+                    </TableHead>
+
+                    
+                    <TableBody>
+                      {/* Last Month Remaining */}
+
+                      <TableRow>
+                        <TableCell className="font-medium text-gray-700">
+                          Last Month Remaining
+                        </TableCell>
+                        <TableCell align="right" className="font-bold">
+                          ₹
+                          {matchingVcMonthly.last_month_remaining_amount?.toLocaleString() ||
+                            0}
+                        </TableCell>
+                      </TableRow>
+
+                      {/* Collections Breakdown */}
+                      <TableRow className="bg-green-50">
+                        <TableCell
+                          colSpan={2}
+                          className="font-bold text-xs text-green-800"
+                        >
+                          Collections (Added)
+                        </TableCell>
+                      </TableRow>
+
+                      {/* Monthly Contribution */}
+                      <TableRow>
+                        <TableCell className="pl-6 text-sm text-gray-600">
+                          Monthly Contribution
+                        </TableCell>
+                        <TableCell
+                          align="right"
+                          className="text-green-600 font-medium"
+                        >
+                          + ₹
+                          {matchingVcMonthly.total_monthly_contribution?.toLocaleString() ||
+                            0}
+                        </TableCell>
+                      </TableRow>
+
+                      {/* Loan Interest */}
+                      <TableRow>
+                        <TableCell className="pl-6 text-sm text-gray-600">
+                          Loan Interest
+                        </TableCell>
+                        <TableCell
+                          align="right"
+                          className="text-green-600 font-medium"
+                        >
+                          + ₹
+                          {matchingVcMonthly.total_loan_vyaj?.toLocaleString() ||
+                            0}
+                        </TableCell>
+                      </TableRow>
+
+                      {/* Loan EMI */}
+                      <TableRow>
+                        <TableCell className="pl-6 text-sm text-gray-600">
+                          Loan EMI
+                        </TableCell>
+                        <TableCell
+                          align="right"
+                          className="text-green-600 font-medium"
+                        >
+                          + ₹
+                          {matchingVcMonthly.total_loan_repayment?.toLocaleString() ||
+                            0}
+                        </TableCell>
+                      </TableRow>
+
+                      {/* Part Payment */}
+                      <TableRow>
+                        <TableCell className="pl-6 text-sm text-gray-600">
+                          Part Payment
+                        </TableCell>
+                        <TableCell
+                          align="right"
+                          className="text-green-600 font-medium"
+                        >
+                          + ₹
+                          {matchingVcMonthly.total_part_payment?.toLocaleString() ||
+                            0}
+                        </TableCell>
+                      </TableRow>
+
+                      {/* Total Collected Row */}
+                      <TableRow className="bg-gray-100 border-t border-gray-300">
+                        <TableCell className="font-bold text-gray-800">
+                          Total Collected
+                        </TableCell>
+                        <TableCell
+                          align="right"
+                          className="font-bold text-green-700"
+                        >
+                          ₹
+                          {(
+                            (matchingVcMonthly.total_monthly_contribution ||
+                              0) +
+                            (matchingVcMonthly.total_loan_vyaj || 0) +
+                            (matchingVcMonthly.total_loan_repayment || 0) +
+                            (matchingVcMonthly.total_part_payment || 0)
+                          ).toLocaleString()}
+                        </TableCell>
+                      </TableRow>
+
+                      {/* New Loans */}
+                      {matchingVcMonthly.loans?.length > 0 && (
+                        <>
+                          <TableRow className="bg-gray-100">
+                            <TableCell
+                              colSpan={2}
+                              className="font-bold text-xs text-gray-600"
+                            >
+                              New Loans Distributed
+                            </TableCell>
+                          </TableRow>
+                          {matchingVcMonthly.loans.map(
+                            (loan: any, idx: number) => {
+                              // Correctly lookup user name from the passed user data
+                              const userName =
+                                userVcMonthlyData.find(
+                                  (u: any) => u.user_id._id === loan.user_id,
+                                )?.user_id.name || "Unknown User";
+                              return (
+                                <TableRow key={idx}>
+                                  <TableCell className="pl-6 text-sm">
+                                    {userName}
+                                  </TableCell>
+                                  <TableCell
+                                    align="right"
+                                    className="text-red-600 font-medium"
+                                  >
+                                    - ₹{loan.loan_amount?.toLocaleString()}
+                                  </TableCell>
+                                </TableRow>
+                              );
+                            },
+                          )}
+                        </>
+                      )}
+
+                      {/* Final Remaining */}
+                      <TableRow className="bg-gray-50 border-t-2 border-gray-200">
+                        <TableCell className="font-bold text-gray-900 text-lg">
+                          Remaining Amount
+                        </TableCell>
+                        <TableCell
+                          align="right"
+                          className="font-bold text-green-700 text-lg"
+                        >
+                          ₹
+                          {matchingVcMonthly.remaining_amount?.toLocaleString() ||
+                            0}
+                        </TableCell>
+                      </TableRow>
+                      
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              );
+            })()}
+          </div>
+        ) : (
+          ""
+        )}
+      </div>
+      {!done && (
+        <div className="flex justify-center">
+          <Button
+            variant="contained"
+            color="success"
+            onClick={() => handleLock()}
+          >
+            Finalize this month
+          </Button>
+        </div>
+      )}
+
+      {done && (
+        <React.Suspense fallback={<CircularProgress />}>
+          <NextMonthData id={vcId} />
+        </React.Suspense>
+      )}
     </div>
   );
 };

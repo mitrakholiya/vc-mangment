@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getVentureById } from "./useVenture";
+import { getVentureById  } from "./useVenture";
 
 export const useGetVentureById = (id: string | null) => {
   return useQuery({
@@ -8,3 +8,5 @@ export const useGetVentureById = (id: string | null) => {
     enabled: !!id, // Only run query if id exists
   });
 };
+
+

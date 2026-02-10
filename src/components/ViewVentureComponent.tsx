@@ -73,19 +73,19 @@ export default function ViewVentureComponent({
     data?.vc_id || "",
   );
 
-  const handleRequestToPending = async () => {
-    if (!data?.vc_id) return;
-    try {
-      const res = await requestTopanding();
-      if (res?.success) {
-        toast.success(res.message);
-      } else {
-        toast.error(res.message);
-      }
-    } catch (error: any) {
-      toast.error(error?.message || "Something went wrong");
-    }
-  };
+  // const handleRequestToPending = async () => {
+  //   if (!data?.vc_id) return;
+  //   try {
+  //     const res = await requestTopanding();
+  //     if (res?.success) {
+  //       toast.success(res.message);
+  //     } else {
+  //       toast.error(res.message);
+  //     }
+  //   } catch (error: any) {
+  //     toast.error(error?.message || "Something went wrong");
+  //   }
+  // };
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);

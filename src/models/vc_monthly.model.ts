@@ -17,6 +17,7 @@ export interface IVcMonthly extends Document {
   remaining_amount: number;
   month: number;
   year: number;
+  lock: boolean;
   created_at: Date;
   updated_at: Date;
 }
@@ -92,6 +93,11 @@ const VcMonthlySchema = new Schema<IVcMonthly>(
       type: Number,
       required: true,
     },
+    lock:{
+      type: Boolean,
+      required: true,
+      default: false,
+    }
   },
   {
     timestamps: {

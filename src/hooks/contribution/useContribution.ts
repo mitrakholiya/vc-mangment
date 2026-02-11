@@ -61,6 +61,25 @@ export const usePutDirectApprove = () => {
   });
 };
 
+// Admin  Redo Part Payment
+// ---------------------------------------------------------------------
+
+const putRedoApprove = async (
+  id:string) => {
+  const res = await api.put("/admin/redo_approve", {
+    id,
+  });
+  return res.data;
+};
+
+export const usePutRedoApprove = () => {
+  return useMutation({
+    mutationFn: (id: string) =>
+      putRedoApprove(id),
+  });
+};
+
+
 // ---------------------------------------------------------------------
 
 // Admin Loan Distribution

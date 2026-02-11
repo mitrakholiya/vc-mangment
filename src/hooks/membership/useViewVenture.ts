@@ -10,7 +10,7 @@ export const useViewVentureQuery = () => {
 
 export const useUserVcMonthlyById = (id: string) => {
   return useQuery({
-    queryKey: ["viewVentureById"],
+    queryKey: ["viewVentureById", id],
     queryFn: () => viewUserVcMonthlyById(id),
 
     enabled: !!id,

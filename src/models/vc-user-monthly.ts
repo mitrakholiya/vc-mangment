@@ -7,10 +7,11 @@ export interface IVcUserMonthly extends Document {
   year: number;
   monthly_contribution: number;
   loan_amount: number;
+  last_month_remaining_loan: number;
   loan_interest: number;
   loan_monthly_emi: number;
   part_payment: number;
-
+  
   remaining_loan: number;
   total_payable: number;
   created_at?: Date;
@@ -27,6 +28,7 @@ const VcUserMonthlySchema: Schema = new Schema(
     year: { type: Number, required: true },
     monthly_contribution: { type: Number, required: true },
     loan_amount: { type: Number, required: true },
+    last_month_remaining_loan: { type: Number, required: true },
     loan_interest: { type: Number, required: true },
     loan_monthly_emi: { type: Number, required: true },
     part_payment: { type: Number, required: true, default: 0 },

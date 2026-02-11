@@ -87,7 +87,7 @@ export async function POST(req: Request) {
           // If there was a loan from previous month, continue tracking it
           if (previousRecord && previousRecord.remaining_loan > 0) {
             remainingLoan = previousRecord.remaining_loan;
-            loanAmount = remainingLoan;
+            loanAmount = previousRecord.loan_amount || 0; // Persist total loan
 
             // Interest Calculation (Remaining Loan * Rate%)
             const interestAmount =
@@ -113,6 +113,7 @@ export async function POST(req: Request) {
             loan_monthly_emi: loanMonthlyEmi,
 
             remaining_loan: remainingLoan,
+            last_month_remaining_loan: remainingLoan, // Opening balance from previous month
             total_payable: totalPayable,
           });
 

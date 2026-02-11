@@ -84,6 +84,7 @@ export async function POST(req: Request) {
 
     let totalDisbursed = 0;
 
+    // New loan 
     for (const [recordId, amountStr] of Object.entries(loan)) {
       const amount = Number(amountStr);
       if (isNaN(amount) || amount <= 0) continue;
@@ -123,6 +124,9 @@ export async function POST(req: Request) {
       if (!nextMonthRecord) {
         // Create new record for next month
         // Balance = Current Remaining + New Loan Amount
+
+
+        let new_loan_amount = amount + userMonthlyRecord.loan_amount
         const openingBalance = userMonthlyRecord.remaining_loan || 0;
         const newBalance = openingBalance + amount;
 
@@ -135,17 +139,24 @@ export async function POST(req: Request) {
           month: nextMonth,
           year: nextYear,
           monthly_contribution: userMonthlyRecord.monthly_contribution,
-          loan_amount: newBalance, // Set total outstanding for next month
+          loan_amount: new_loan_amount, // Accumulate total loan
           loan_interest: newInterest,
           loan_monthly_emi: newEmi,
 
           remaining_loan: newBalance, // Set total outstanding
+          last_month_remaining_loan: newBalance, // Opening balance from prev month
           total_payable:
             userMonthlyRecord.monthly_contribution + newEmi + newInterest,
           status: "none",
         });
       } else {
         // Update existing next month record by ADDING new loan
+        // Ensure backwards compatibility
+        if (nextMonthRecord.last_month_remaining_loan === undefined) {
+          nextMonthRecord.last_month_remaining_loan =
+            userMonthlyRecord.remaining_loan || 0;
+        }
+
         // Since current month is not updated, we can't sync. We must add.
         nextMonthRecord.loan_amount =
           (nextMonthRecord.loan_amount || 0) + amount;

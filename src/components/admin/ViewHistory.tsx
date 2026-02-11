@@ -64,7 +64,9 @@ const ViewHistory: React.FC<ViewHistoryProps> = ({ id }) => {
 
   return (
     <div className="mt-8 space-y-6">
-      <h6 className="font-bold text-gray-800 text-xl px-1 mb-4">Venture History</h6>
+      <h6 className="font-bold text-gray-800 text-xl px-1 mb-4">
+        Venture History
+      </h6>
 
       {vcMonthlyList.map((monthRecord: any) => {
         const monthName = getMonthName(monthRecord.month);
@@ -177,7 +179,13 @@ const ViewHistory: React.FC<ViewHistoryProps> = ({ id }) => {
                     <TableRow>
                       <TableCell className="font-bold text-xs">Name</TableCell>
                       <TableCell align="center" className="font-bold text-xs">
-                        Contribution
+                        Contribution(Hapto)
+                      </TableCell>
+                      <TableCell align="center" className="font-bold text-xs">
+                        Loan
+                      </TableCell>
+                      <TableCell align="center" className="font-bold text-xs">
+                        Baki Loan
                       </TableCell>
                       <TableCell align="center" className="font-bold text-xs">
                         Loan Hapto
@@ -186,10 +194,7 @@ const ViewHistory: React.FC<ViewHistoryProps> = ({ id }) => {
                         Loan Interest
                       </TableCell>
                       <TableCell align="center" className="font-bold text-xs">
-                        Loan
-                      </TableCell>
-                      <TableCell align="center" className="font-bold text-xs">
-                        Remaining Loan
+                        Part Payment
                       </TableCell>
                       <TableCell align="center" className="font-bold text-xs">
                         Total
@@ -205,16 +210,6 @@ const ViewHistory: React.FC<ViewHistoryProps> = ({ id }) => {
                         <TableCell align="right" className="text-xs">
                           ₹{user.monthly_contribution?.toLocaleString()}
                         </TableCell>
-                        <TableCell align="right" className="text-xs">
-                          ₹
-                          {(
-                            (user.loan_monthly_emi || 0) +
-                            (user.part_payment || 0)
-                          ).toLocaleString()}
-                        </TableCell>
-                        <TableCell align="right" className="text-xs">
-                          ₹{user.loan_interest?.toLocaleString()}
-                        </TableCell>
                         <TableCell
                           align="right"
                           className="text-xs text-red-600 font-medium"
@@ -228,13 +223,29 @@ const ViewHistory: React.FC<ViewHistoryProps> = ({ id }) => {
                             ? `₹${user.remaining_loan.toLocaleString()}`
                             : "-"}
                         </TableCell>
+                        <TableCell align="right" className="text-xs">
+                          ₹{(user.loan_monthly_emi || 0).toLocaleString()}
+                        </TableCell>
+                        <TableCell align="right" className="text-xs">
+                          ₹{user.loan_interest?.toLocaleString()}
+                        </TableCell>
+                        <TableCell
+                          align="right"
+                          className="text-xs text-blue-600"
+                        >
+                          {user.part_payment > 0
+                            ? `₹${user.part_payment.toLocaleString()}`
+                            : "-"}
+                        </TableCell>
                         <TableCell align="right">
                           <span>
                             ₹
                             {(
                               (user.monthly_contribution || 0) +
                               (user.loan_monthly_emi || 0) +
-                              (user.loan_interest || 0)).toLocaleString()}
+                              (user.loan_interest || 0) +
+                              (user.part_payment || 0)
+                            ).toLocaleString()}
                           </span>
                         </TableCell>
                       </TableRow>
@@ -242,7 +253,7 @@ const ViewHistory: React.FC<ViewHistoryProps> = ({ id }) => {
                     {usersForMonth.length === 0 && (
                       <TableRow>
                         <TableCell
-                          colSpan={7}
+                          colSpan={8}
                           className="text-center text-xs py-4 text-gray-400"
                         >
                           No member records found for this month.

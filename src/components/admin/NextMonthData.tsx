@@ -77,16 +77,16 @@ const NextMonthData: React.FC<NextMonthDataProps> = ({ id }) => {
               </TableCell>
               <TableCell className="font-bold text-xs">Name</TableCell>
               <TableCell align="right" className="font-bold text-xs">
-                Opening Balance
+                Baki Loan
               </TableCell>
               <TableCell align="right" className="font-bold text-xs">
-                EMI
+                Loan Hapto
               </TableCell>
               <TableCell align="right" className="font-bold text-xs">
-                Interest
+                Vyaj
               </TableCell>
               <TableCell align="right" className="font-bold text-xs">
-                Contribution
+                Hapto
               </TableCell>
               <TableCell align="right" className="font-bold text-xs">
                 Total Payable
@@ -107,24 +107,24 @@ const NextMonthData: React.FC<NextMonthDataProps> = ({ id }) => {
                 </TableCell>
                 <TableCell align="right" className="text-xs text-gray-600">
                   {row.remaining_loan > 0
-                    ? `₹${row.remaining_loan.toLocaleString()}`
+                    ? `₹${row.remaining_loan.toFixed(2).toLocaleString()}`
                     : "-"}
                 </TableCell>
                 <TableCell align="right" className="text-xs text-blue-600">
                   {row.loan_monthly_emi > 0
-                    ? `+ ₹${row.loan_monthly_emi.toLocaleString()}`
+                    ? `+ ₹${row.loan_monthly_emi.toFixed(2).toLocaleString()}`
                     : "-"}
                 </TableCell>
                 <TableCell align="right" className="text-xs text-blue-600">
                   {row.loan_interest > 0
-                    ? `+ ₹${row.loan_interest.toLocaleString()}`
+                    ? `+ ₹${row.loan_interest.toFixed(2).toLocaleString()}`
                     : "-"}
                 </TableCell>
                 <TableCell align="right" className="text-xs text-green-600">
-                  + ₹{row.monthly_contribution.toLocaleString()}
+                  + ₹{row.monthly_contribution.toFixed(2).toLocaleString()}
                 </TableCell>
                 <TableCell align="right" className="text-xs font-bold">
-                  ₹{row.total_payable.toLocaleString()}
+                  ₹{row.total_payable.toFixed(2).toLocaleString()}
                 </TableCell>
               </TableRow>
             ))}

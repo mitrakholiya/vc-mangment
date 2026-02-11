@@ -11,8 +11,7 @@ interface CustomJwtPayload extends jwt.JwtPayload {
 
 export async function PUT(req: Request) {
   try {
-    const { id, part_payment } = await req.json(); // id is the VcUserMonthly record ID
-    const partPaymentVal = Number(part_payment) || 0;
+    const { id } = await req.json(); // id is the VcUserMonthly record ID
 
     if (!id) {
       return NextResponse.json(
@@ -69,55 +68,30 @@ export async function PUT(req: Request) {
     }
 
     // 3. Update the status
-    if (contribution.status === "approved") {
+    if (contribution.status === "pending" || contribution.status === "none") {
       return NextResponse.json(
-        { success: true, message: "Contribution is already approved" },
+        { success: true, message: "Contribution is already in pending" },
         { status: 200 },
       );
     }
-
-    // Ensure backwards compatibility for new required field
-    if (contribution.last_month_remaining_loan === undefined) {
-      contribution.last_month_remaining_loan = contribution.remaining_loan || 0;
-    }
-
-    contribution.status = "approved";
-    // Optional: Set paid_at date if schema supports it
-    contribution.paid_at = new Date();
-
     // ✅ Update Loan Repayment Status if applicable
-    // ✅ Update Loan Repayment Status if applicable
-    const emiPaid = contribution.loan_monthly_emi || 0;
-    const totalPaidNow = emiPaid + partPaymentVal;
+    contribution.status = "none";
 
-    // Always update part_payment, even if 0, to ensure it's recorded
-    contribution.part_payment = partPaymentVal;
-
-    console.log(partPaymentVal, "partpayment");
-
-    // Deduct EMI and Part Payment from Remaining Loan
-    if (emiPaid > 0 || partPaymentVal > 0) {
-      const totalDeduction = emiPaid + partPaymentVal;
-      const currentRemaining = contribution.remaining_loan || 0;
-      const newRemaining = currentRemaining - totalDeduction;
-      contribution.remaining_loan = newRemaining > 0 ? newRemaining : 0;
-      contribution.total_payable += partPaymentVal;
-      // Track part payment on the record directly? Schema might not have field.
-      // Ensuring part_payment doesn't get lost?
-      // Usually we should store it. For now updating aggregate.
-    }
+    contribution.remaining_loan +=
+      contribution.part_payment + contribution.loan_monthly_emi;
+    const partPayment = contribution.part_payment;
+    contribution.part_payment = 0;
+    contribution.total_payable =
+      contribution.monthly_contribution +
+      contribution.loan_monthly_emi +
+      contribution.loan_interest;
 
     await contribution.save();
 
     // ✅ Add contribution to Venture Wallet
     // Wallet += Monthly Contribution + EMI + Part Payment + Interest
-    const interestPaid = contribution.loan_interest || 0;
-    const totalToWallet =
-      (contribution.monthly_contribution || 0) +
-      emiPaid +
-      partPaymentVal +
-      interestPaid;
-    venture.fund_wallet = (venture.fund_wallet || 0) + totalToWallet;
+    venture.fund_wallet =
+      (venture.fund_wallet || 0) - partPayment - contribution.total_payable;
 
     await venture.save();
 
@@ -132,18 +106,18 @@ export async function PUT(req: Request) {
     });
 
     if (vcMonthly) {
+      vcMonthly.total_part_payment =
+        (vcMonthly.total_part_payment || 0) - partPayment;
       vcMonthly.total_monthly_contribution =
-        (vcMonthly.total_monthly_contribution || 0) +
+        (vcMonthly.total_monthly_contribution || 0) -
         (contribution.monthly_contribution || 0);
 
       vcMonthly.total_loan_repayment =
-        (vcMonthly.total_loan_repayment || 0) + emiPaid;
-
-      vcMonthly.total_part_payment =
-        (vcMonthly.total_part_payment || 0) + partPaymentVal;
+        (vcMonthly.total_loan_repayment || 0) -
+        (contribution.loan_monthly_emi || 0);
 
       vcMonthly.total_loan_vyaj =
-        (vcMonthly.total_loan_vyaj || 0) + interestPaid;
+        (vcMonthly.total_loan_vyaj || 0) - (contribution.loan_interest || 0);
 
       await vcMonthly.save();
     } else {
@@ -154,7 +128,7 @@ export async function PUT(req: Request) {
 
     return NextResponse.json({
       success: true,
-      message: "Contribution approved successfully",
+      message: "Contribution Rejected successfully",
       data: contribution,
     });
   } catch (error: any) {

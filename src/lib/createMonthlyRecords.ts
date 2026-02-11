@@ -44,6 +44,7 @@ export async function createUserMonthlyRecord({
     loan_monthly_emi: 0,
     part_payment: 0,
     remaining_loan: 0,
+    last_month_remaining_loan: 0,
     total_payable: monthly_contribution,
     status: "none",
   });

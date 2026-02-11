@@ -72,6 +72,13 @@ export async function PUT(req: Request) {
     const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1;
     const nextYear = currentMonth === 12 ? currentYear + 1 : currentYear;
 
+
+    let currentVcMonthly = await VcMonthlyModel.findOne({
+      vc_id: venture._id,
+      month: currentMonth,
+      year: currentYear,
+    });
+
     // Create Next VcMonthly (if not exists)
     let nextVcMonthly = await VcMonthlyModel.findOne({
       vc_id: venture._id,
@@ -104,6 +111,20 @@ export async function PUT(req: Request) {
         year: currentYear,
       });
 
+
+      // If user take loan in current month
+
+     let totalLoanAmount = currentRecord ? currentRecord.loan_amount : 0;
+
+     console.log("totalLoanAmount", totalLoanAmount);
+      // it add in total loan amount
+      let loan = currentVcMonthly.loans.find((loan:{user_id:string, amount:number}) => loan.user_id === member.user_id);
+
+      
+      totalLoanAmount += loan ? loan.amount : 0;
+
+      console.log("After New Loan Added", totalLoanAmount);
+
       const remainingLoan = currentRecord ? currentRecord.remaining_loan : 0;
 
       // Calculate Next Month Interest/EMI
@@ -130,10 +151,11 @@ export async function PUT(req: Request) {
           month: nextMonth,
           year: nextYear,
           monthly_contribution: monthlyContribution,
-          loan_amount: remainingLoan, // Outstanding principal carried over
+          loan_amount: totalLoanAmount || 0, // Persist Total Loan Amount
           loan_interest: newInterest,
           loan_monthly_emi: newEmi,
           remaining_loan: remainingLoan, // Opens with this balance
+          last_month_remaining_loan: remainingLoan, // Balance from previous month
           total_payable: totalPayable,
           status: "none",
           part_payment: 0,

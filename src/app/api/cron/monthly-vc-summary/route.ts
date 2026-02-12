@@ -142,6 +142,7 @@ export async function POST(req: Request) {
           total_loan_repayment: totalLoanRepayment,
           total_part_payment: totalPartPayment,
           loans: loans,
+          exiting_members: [],
           month: currentMonth,
           year: currentYear,
         });

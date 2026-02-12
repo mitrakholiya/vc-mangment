@@ -1,16 +1,12 @@
 {
   "crons": [
     {
-      "path": "/api/cron/monthly-contributions",
+      "path": "/api/cron/monthly-user-vc-logs",
       "schedule": "0 0 1 * *"
     },
     {
-      "path": "/api/cron/monthly-user-vc-logs",
-      "schedule": "50 23 28-31 * *"
-    },
-    {
       "path": "/api/cron/monthly-vc-summary",
-      "schedule": "59 23 28-31 * *"
+      "schedule": "0 0 1 * *"
     }
   ]
 }

@@ -112,16 +112,16 @@ const NextMonthData: React.FC<NextMonthDataProps> = ({ id }) => {
                 </TableCell>
                 <TableCell align="right" className="text-xs text-blue-600">
                   {row.loan_monthly_emi > 0
-                    ? `+ ₹${row.loan_monthly_emi.toFixed(2).toLocaleString()}`
+                    ? `₹${row.loan_monthly_emi.toFixed(2).toLocaleString()}`
                     : "-"}
                 </TableCell>
                 <TableCell align="right" className="text-xs text-blue-600">
                   {row.loan_interest > 0
-                    ? `+ ₹${row.loan_interest.toFixed(2).toLocaleString()}`
+                    ? `₹${row.loan_interest.toFixed(2).toLocaleString()}`
                     : "-"}
                 </TableCell>
                 <TableCell align="right" className="text-xs text-green-600">
-                  + ₹{row.monthly_contribution.toFixed(2).toLocaleString()}
+                  ₹{row.monthly_contribution.toFixed(2).toLocaleString()}
                 </TableCell>
                 <TableCell align="right" className="text-xs font-bold">
                   ₹{row.total_payable.toFixed(2).toLocaleString()}

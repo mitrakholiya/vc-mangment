@@ -66,9 +66,9 @@ export async function POST(req: Request) {
         monthly_contribution: monthly_emi,
       });
 
-      console.log(
-        `Created monthly records for new venture ${newVC._id} and admin ${decode.userId}`,
-      );
+      // console.log(
+      //   `Created monthly records for new venture ${newVC._id} and admin ${decode.userId}`,
+      // );
     } catch (monthlyRecordError) {
       console.error("Error creating monthly records:", monthlyRecordError);
       // Don't fail the venture creation, just log the error

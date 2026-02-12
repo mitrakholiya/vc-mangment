@@ -91,7 +91,7 @@ export async function POST(req: Request) {
 
       if (amount > venture.max_loan_amount) {
         return NextResponse.json(
-          { success: false, message: "Insufficient funds" },
+          { success: false, message: `Loan amount exceeds maximum limit of ${venture.max_loan_amount}` },
           { status: 200 },
         );
       }

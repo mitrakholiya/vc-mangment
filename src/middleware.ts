@@ -3,21 +3,29 @@ import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
+  const token = request.cookies.get("token")?.value;
 
-  // Define public paths that don't require authentication
-  const isPublicPath = path === "/login" || path === "/register";
+  const publicPaths = ["/login", "/register"];
+  const privatePaths = ["/profile", "/venture", "/join"];
 
-  const token = request.cookies.get("token")?.value || "";
+  const isPublicPath = publicPaths.includes(path);
 
-  // If user is authenticated and tries to access public paths, redirect to home
+  const isPrivatePath =
+    privatePaths.includes(path) ||
+    path === "/view-venture" ||
+    path.startsWith("/view-venture/");
+
+  // Auth user trying to access public pages
   if (isPublicPath && token) {
-    return NextResponse.redirect(new URL("/profile", request.nextUrl));
+    return NextResponse.redirect(new URL("/profile", request.url));
   }
 
-  // If user is not authenticated and tries to access protected paths, redirect to login
-  if (!isPublicPath && !token) {
-    return NextResponse.redirect(new URL("/login", request.nextUrl));
+  // Unauth user trying to access protected pages
+  if (isPrivatePath && !token) {
+    return NextResponse.redirect(new URL("/login", request.url));
   }
+
+  return NextResponse.next();
 }
 
 // See "Matching Paths" below to learn more

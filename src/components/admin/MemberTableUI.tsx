@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 
 import {
   Table,
@@ -33,6 +34,8 @@ import {
   usePutRedoApprove,
 } from "@/hooks/contribution/useContribution";
 import NextMonthData from "./NextMonthData";
+import { Share2, Download } from "lucide-react";
+import { shareMonthlyPdf } from "@/lib/shareMonthlyData";
 
 interface VcUserMonthly {
   _id: string;
@@ -181,6 +184,20 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
   );
   if (done) compalated = false;
 
+  // Calculate selected user for approval dialog
+  // Moved up to avoid hook order issues with early returns
+  const selectedApproveUser = React.useMemo(
+    () =>
+      userVcMonthlyData
+        ? userVcMonthlyData.find((u) => u._id === approveSelectedId)
+        : null,
+    [userVcMonthlyData, approveSelectedId],
+  );
+
+  const maxPartPayment = selectedApproveUser?.remaining_loan || 0;
+  const isPartPaymentInvalid =
+    !!partPaymentInput && Number(partPaymentInput) > maxPartPayment;
+
   if (isLoading)
     return (
       <div className="flex justify-center items-center h-48">
@@ -235,10 +252,11 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
 
   // Approve Dialog State
 
-  const handleOpenApproveDialog = async (id: string, loanAmount: number) => {
-    // If loan amount is 0, approve directly
-    if (loanAmount <= 0) {
-      const res = await onApprove(id, loanAmount);
+  const handleOpenApproveDialog = async (id: string, hasLoan: boolean) => {
+    // If user has no loan at all, we can approve directly.
+    // But if they have a loan (either new or existing), we should show the box.
+    if (!hasLoan) {
+      const res = await onApprove(id, 0);
 
       if (res?.success === true) {
         toast.success("Approved successfully");
@@ -262,6 +280,21 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
   const handleConfirmApprove = async () => {
     if (!approveSelectedId) return;
     const partPayment = partPaymentInput ? Number(partPaymentInput) : 0;
+
+    // Validation: Part payment cannot exceed remaining loan
+    const selectedRecord = userVcMonthlyData.find(
+      (u) => u._id === approveSelectedId,
+    );
+
+    if (selectedRecord) {
+      const remainingLoan = selectedRecord.remaining_loan || 0;
+      if (partPayment > remainingLoan) {
+        toast.error(
+          `Part payment (₹${partPayment}) cannot exceed remaining loan (₹${remainingLoan})`,
+        );
+        return;
+      }
+    }
 
     // Call mutation with object
     const res = await onApprove(approveSelectedId, partPayment);
@@ -309,14 +342,85 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
     }
   };
 
-  // Month/Year passed as props
+  // Calculate totals at component level to pass to share function (duplication of logic inside render, cleaner to lift up)
+  const currentMonthMatch = vcMonthlyData.find(
+    (m: any) => m.month == currentMonthNum && m.year == currentYearNum,
+  );
+  const totalLoansGlobal =
+    currentMonthMatch?.loans?.reduce(
+      (sum: any, loan: any) => sum + loan.loan_amount,
+      0,
+    ) || 0;
+
+  const totalExitingGlobal =
+    currentMonthMatch?.exiting_members?.reduce(
+      (sum: any, member: any) => sum + member.total_paid,
+      0,
+    ) || 0;
+
+  const handleShare = async (action: "share" | "download" = "share") => {
+    // Prepare Data
+    const summaryData = {
+      totalCollection: withOuntLastMonthRema,
+      totalLoans: totalLoansGlobal, // Need to ensure these are accessible or recalculated
+      totalExiting: totalExitingGlobal,
+      remainingBalance:
+        last_month_remaining_amount +
+        withOuntLastMonthRema -
+        totalLoansGlobal -
+        totalExitingGlobal,
+      lastMonthBalance: last_month_remaining_amount,
+    };
+
+    const newLoansDetails =
+      currentMonthMatch?.loans?.map((loan: any) => {
+        const user = userVcMonthlyData.find(
+          (u) => String(u.user_id?._id) === String(loan.user_id),
+        );
+        return {
+          name: user?.user_id?.name || "Unknown Member",
+          loan_amount: loan.loan_amount,
+        };
+      }) || [];
+
+    await shareMonthlyPdf(
+      userVcMonthlyData,
+      monthName,
+      year,
+      "SyncEra Solution",
+      summaryData,
+      newLoansDetails,
+      action,
+    );
+  };
 
   return (
     <div className="mt-4">
-      <Typography className="text-sm mb-2 font-extrabold px-1 text-gray-700 text-center">
-        {monthName} {year}
-      </Typography>
+      <div className="flex justify-between items-center px-2 mb-2">
+        <Typography className="text-sm font-extrabold text-gray-700">
+          {monthName} {year}
+        </Typography>
+        <div className="flex gap-2">
+          <IconButton
+            onClick={() => handleShare("download")}
+            size="small"
+            className="bg-gray-100 hover:bg-gray-200 text-gray-600"
+            title="Download PDF"
+          >
+            <Download className="w-4 h-4" />
+          </IconButton>
+          <IconButton
+            onClick={() => handleShare("share")}
+            size="small"
+            className="bg-gray-100 hover:bg-gray-200 text-gray-600"
+            title="Share PDF"
+          >
+            <Share2 className="w-4 h-4" />
+          </IconButton>
+        </div>
+      </div>
       <TableContainer
+        // ...
         component={Paper}
         className="shadow-md rounded-lg text-[8px] my-[10px]"
         // sx={{ overflow: "hidden" }}
@@ -364,11 +468,11 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
               <TableCell align="center" sx={{ width: "60px", p: "2px" }}>
                 <strong>Total Payable</strong>
               </TableCell>
-              {!done && (  
-              <TableCell align="center" sx={{ width: "80px", p: "2px" }}>
-                <strong>Action</strong>
-              </TableCell>
-                  )}
+              {!done && (
+                <TableCell align="center" sx={{ width: "80px", p: "2px" }}>
+                  <strong>Action</strong>
+                </TableCell>
+              )}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -429,116 +533,116 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
                   ₹{row.total_payable.toLocaleString()}
                 </TableCell>
 
-
-{/* IN vc monthly lock = false than show */}
-                {!done &&(
-                <TableCell align="center">
-                  <div className="flex items-center justify-center gap-1">
-                    {row.status !== "approved" && (
-                      <>
-                        <span
-                          className="px-3 py-0.5 rounded-xl text-primary bg-gray-100 border-[1px] text-[9px] font-medium cursor-pointer"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDirectApprovel(row._id);
-                          }}
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            fill="currentColor"
-                            className="w-4 h-4"
+                {/* IN vc monthly lock = false than show */}
+                {!done && (
+                  <TableCell align="center">
+                    <div className="flex items-center justify-center gap-1">
+                      {row.status !== "approved" && (
+                        <>
+                          <span
+                            className="px-3 py-0.5 rounded-xl text-primary bg-gray-100 border-[1px] text-[9px] font-medium cursor-pointer"
+                            title="Direct Approve (No Part Payment)"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDirectApprovel(row._id);
+                            }}
                           >
-                            <path
-                              fillRule="evenodd"
-                              d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        </span>
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 24 24"
+                              fill="currentColor"
+                              className="w-4 h-4"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          </span>
 
-                        <span
-                          className={`px-3 py-0.5 rounded-xl text-[9px] text-primary font-medium cursor-pointer ${
-                            row.status === "pending"
-                              ? "bg-yellow-500 text-white"
-                              : row.status === "paid"
-                                ? "bg-green-100 text-green-800"
-                                : "bg-gray-100 border-[1px]"
-                          }`}
-                          onClick={() =>
-                            handleOpenApproveDialog(row._id, row.loan_amount)
-                          }
-                        >
-                          {/* {row.status === "none"
-                            ? "P"
-                            : row.status.charAt(0).toUpperCase()} */}
-                          {(row.status === "pending" ||
-                            row.status === "none") && (
+                          <span
+                            className={`px-3 py-0.5 rounded-xl text-[9px] text-primary font-medium cursor-pointer ${
+                              row.status === "pending"
+                                ? "bg-yellow-500 text-white"
+                                : row.status === "paid"
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-gray-100 border-[1px]"
+                            }`}
+                            title="Approve with Part Payment"
+                            onClick={() =>
+                              handleOpenApproveDialog(
+                                row._id,
+                                row.remaining_loan > 0 || row.loan_amount > 0,
+                              )
+                            }
+                          >
+                            {(row.status === "pending" ||
+                              row.status === "none") && (
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth={1.5}
+                                stroke="currentColor"
+                                className="w-4 h-4"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M12 4.5v15m7.5-7.5h-15"
+                                />
+                              </svg>
+                            )}
+                          </span>
+                        </>
+                      )}
+                      {row.status === "approved" && (
+                        <>
+                          <span className="flex items-center text-green-600 text-xs font-bold">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 24 24"
+                              fill="currentColor"
+                              className="w-4 h-4 ml-1"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          </span>
+
+                          <IconButton
+                            onClick={() => handelRedoApprovel(row._id)}
+                            size="small"
+                            className="p-1 text-gray-400 hover:text-blue-500"
+                            title="Refresh"
+                          >
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               fill="none"
                               viewBox="0 0 24 24"
                               strokeWidth={1.5}
                               stroke="currentColor"
-                              className="w-4 h-4"
+                              className="w-3 h-3"
                             >
                               <path
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
-                                d="M12 4.5v15m7.5-7.5h-15"
+                                d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
                               />
                             </svg>
-                          )}
-                        </span>
-                      </>
-                    )}
-                    {row.status === "approved" && (
-                      <>
-                        <span className="flex items-center text-green-600 text-xs font-bold">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            fill="currentColor"
-                            className="w-4 h-4 ml-1"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        </span>
-
-                        <IconButton
-                          onClick={() => handelRedoApprovel(row._id)}
-                          size="small"
-                          className="p-1 text-gray-400 hover:text-blue-500"
-                          title="Refresh"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth={1.5}
-                            stroke="currentColor"
-                            className="w-3 h-3"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
-                            />
-                          </svg>
-                        </IconButton>
-                      </>
-                    )}
-                  </div>
-                </TableCell>
+                          </IconButton>
+                        </>
+                      )}
+                    </div>
+                  </TableCell>
                 )}
               </TableRow>
             ))}
             {/* Total Row */}
-
 
             <TableRow className="bg-gray-200 font-bold">
               <TableCell colSpan={2} align="center">
@@ -592,9 +696,7 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
               </TableCell>
               {/* Empty cell for Action column in Total Row */}
 
-              {!done &&(
-              <TableCell></TableCell>
-              )}
+              {!done && <TableCell></TableCell>}
             </TableRow>
           </TableBody>
         </Table>
@@ -612,6 +714,10 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
         </DialogTitle>
         <DialogContent>
           <div className="pt-2">
+            <Typography variant="caption" className="mb-2 block text-gray-600">
+              Starts with part payment. Max available:{" "}
+              <strong>₹{maxPartPayment.toLocaleString()}</strong>
+            </Typography>
             <TextField
               autoFocus
               label="Part Payment (Optional)"
@@ -621,8 +727,13 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
               size="small"
               value={partPaymentInput}
               onChange={(e) => setPartPaymentInput(e.target.value)}
-              placeholder="Enter amount if any"
-              helperText="This amount will be deducted from remaining loan"
+              placeholder={`Max ${maxPartPayment}`}
+              error={isPartPaymentInvalid}
+              helperText={
+                isPartPaymentInvalid
+                  ? `Cannot exceed remaining loan (₹${maxPartPayment})`
+                  : "This amount will be deducted from remaining loan"
+              }
             />
           </div>
         </DialogContent>
@@ -1081,6 +1192,60 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
                         </>
                       )}
 
+                      {/* Exiting Member */}
+
+                      {matchingVcMonthly.exiting_members?.length > 0 && (
+                        <>
+                          <TableRow className="bg-gray-100">
+                            <TableCell
+                              colSpan={2}
+                              className="font-bold text-xs text-gray-600"
+                            >
+                              Exiting Members
+                            </TableCell>
+                          </TableRow>
+                          {matchingVcMonthly.exiting_members.map(
+                            (v: any, idx: number) => {
+                              // Correctly lookup user name from the passed user data
+                              const userName =
+                                userVcMonthlyData.find(
+                                  (u: any) => u.user_id._id === v.user_id,
+                                )?.user_id.name || "Unknown User";
+                              return (
+                                <TableRow key={idx}>
+                                  <div className="flex justify-between items-center gap-2">
+                                    <span className="pl-6 text-xs">
+                                      {userName}
+                                    </span>
+
+                                    <span className="text-xs text-primary">
+                                      Total monthly hapto
+                                      <br />₹
+                                      {v?.total_monthly_contribution?.toLocaleString()}
+                                    </span>
+
+                                    <span className="text-xs text-primary">
+                                      Total Vyaj ₹
+                                      {v?.total_vyaj?.toLocaleString()}
+                                    </span>
+                                    <span className="text-xs text-primary">
+                                      Total Loan ₹
+                                      {v?.remaning_loan?.toLocaleString()}
+                                    </span>
+                                  </div>
+                                  <TableCell>
+                                    <span className="text-xs text-primary">
+                                      Total Paid ₹
+                                      {v?.total_paid?.toLocaleString()}
+                                    </span>
+                                  </TableCell>
+                                </TableRow>
+                              );
+                            },
+                          )}
+                        </>
+                      )}
+
                       {/* Final Remaining */}
                       <TableRow className="bg-gray-50 border-t-2 border-gray-200">
                         <TableCell className="font-bold text-gray-900 text-lg">
@@ -1107,7 +1272,7 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
       </div>
 
       {compalated && (
-        <div className="flex justify-center gap-4 my-8">
+        <div className="flex justify-center gap-4 my-8 flex-wrap">
           <Button
             variant="contained"
             color="secondary"
@@ -1143,6 +1308,32 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
               Finalize this month
             </Button>
           )}
+
+          <Link href={`/leave-vc/${vcId}`} passHref>
+            <Button
+              variant="outlined"
+              color="primary"
+              className="shadow-md font-bold"
+              startIcon={
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-5 h-5"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"
+                  />
+                </svg>
+              }
+            >
+              Leave Mange
+            </Button>
+          </Link>
         </div>
       )}
 

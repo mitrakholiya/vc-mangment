@@ -5,6 +5,15 @@ export interface IVcMonthlyLoan {
   loan_amount: number;
 }
 
+export interface IVcMonthlyExiting {
+  user_id: string;
+  total_monthly_contribution: number;
+  remaning_loan: number;
+  total_vyaj: number;
+  total: number;
+  total_paid: number;
+}
+
 export interface IVcMonthly extends Document {
   vc_id: { type: Schema.Types.ObjectId; ref: "Venture"; required: true };
   last_month_remaining_amount: number;
@@ -14,6 +23,8 @@ export interface IVcMonthly extends Document {
   total: number;
   total_loan_vyaj: number;
   loans: IVcMonthlyLoan[];
+  // New field to track exiting members and their amounts
+  exiting_members: IVcMonthlyExiting[];
   remaining_amount: number;
   month: number;
   year: number;
@@ -29,6 +40,37 @@ const VcMonthlyLoanSchema = new Schema<IVcMonthlyLoan>(
       required: true,
     },
     loan_amount: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
+  },
+  { _id: false },
+);
+
+const VcMonthlyExitingSchema = new Schema<IVcMonthlyExiting>(
+  {
+    user_id: {
+      type: String,
+      required: true,
+    },
+    total_monthly_contribution: {
+      type: Number,
+      required: true,
+    },
+    remaning_loan: {
+      type: Number,
+      required: true,
+    },
+    total_vyaj: {
+      type: Number,
+      required: true,
+    },
+    total: {
+      type: Number,
+      required: true,
+    },
+    total_paid: {
       type: Number,
       required: true,
       default: 0,
@@ -78,6 +120,12 @@ const VcMonthlySchema = new Schema<IVcMonthly>(
       type: [VcMonthlyLoanSchema],
       default: [],
     },
+
+    exiting_members: {
+      type: [VcMonthlyExitingSchema],
+      default: [],
+    },
+
     remaining_amount: {
       type: Number,
       required: true,
@@ -93,11 +141,11 @@ const VcMonthlySchema = new Schema<IVcMonthly>(
       type: Number,
       required: true,
     },
-    lock:{
+    lock: {
       type: Boolean,
       required: true,
       default: false,
-    }
+    },
   },
   {
     timestamps: {
@@ -126,8 +174,14 @@ VcMonthlySchema.pre("save", async function (this: IVcMonthly) {
     0,
   );
 
-  // Calculate remaining_amount = total - total loans
-  this.remaining_amount = this.total - totalLoans;
+  // Calculate total exiting amount
+  const totalExiting = this.exiting_members.reduce(
+    (sum, member) => sum + member.total_paid,
+    0,
+  );
+
+  // Calculate remaining_amount = total - total loans - total exiting
+  this.remaining_amount = this.total - totalLoans - totalExiting;
 });
 
 const VcMonthlyModel =

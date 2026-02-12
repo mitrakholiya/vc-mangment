@@ -172,6 +172,99 @@ const ViewHistory: React.FC<ViewHistoryProps> = ({ id }) => {
                 </div>
               </div>
 
+              {/* VC Summary Table */}
+              <TableContainer
+                component={Paper}
+                elevation={0}
+                className="mb-4 border-b"
+              >
+                <Typography className="p-3 font-bold text-sm bg-gray-50 text-gray-700">
+                  VC Monthly Summary
+                </Typography>
+                <Table size="small">
+                  <TableHead className="bg-gray-100">
+                    <TableRow>
+                      <TableCell align="center" className="font-bold text-xs">
+                        Opening Balance
+                      </TableCell>
+                      <TableCell align="center" className="font-bold text-xs">
+                        Total Hapto
+                      </TableCell>
+                      <TableCell align="center" className="font-bold text-xs">
+                        Total Interest
+                      </TableCell>
+                      <TableCell align="center" className="font-bold text-xs">
+                        Total Loan Hapto
+                      </TableCell>
+                      <TableCell align="center" className="font-bold text-xs">
+                        Part Payment
+                      </TableCell>
+                      <TableCell align="center" className="font-bold text-xs">
+                        Total Fund
+                      </TableCell>
+                      <TableCell align="center" className="font-bold text-xs">
+                        New Loans
+                      </TableCell>
+                      <TableCell align="center" className="font-bold text-xs">
+                        Final Balance
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell align="center" className="text-xs font-medium">
+                        ₹
+                        {monthRecord.last_month_remaining_amount?.toLocaleString()}
+                      </TableCell>
+                      <TableCell
+                        align="center"
+                        className="text-xs text-green-600"
+                      >
+                        ₹
+                        {monthRecord.total_monthly_contribution?.toLocaleString()}
+                      </TableCell>
+                      <TableCell
+                        align="center"
+                        className="text-xs text-blue-600"
+                      >
+                        ₹{monthRecord.total_loan_vyaj?.toLocaleString()}
+                      </TableCell>
+                      <TableCell align="center" className="text-xs">
+                        ₹{monthRecord.total_loan_repayment?.toLocaleString()}
+                      </TableCell>
+                      <TableCell
+                        align="center"
+                        className="text-xs text-purple-600"
+                      >
+                        ₹{monthRecord.total_part_payment?.toLocaleString()}
+                      </TableCell>
+                      <TableCell
+                        align="center"
+                        className="text-xs font-bold text-green-700"
+                      >
+                        ₹{monthRecord.total?.toLocaleString()}
+                      </TableCell>
+                      <TableCell
+                        align="center"
+                        className="text-xs text-red-600"
+                      >
+                        ₹
+                        {monthRecord.loans
+                          ?.reduce(
+                            (acc: number, curr: any) =>
+                              acc + (curr.loan_amount || 0),
+                            0,
+                          )
+                          .toLocaleString()}
+                      </TableCell>
+                      <TableCell align="center" className="text-xs font-bold">
+                        ₹{monthRecord.remaining_amount?.toLocaleString()}
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </TableContainer>
+
               {/* User Table */}
               <TableContainer component={Paper} elevation={0}>
                 <Table size="small">

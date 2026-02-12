@@ -20,6 +20,11 @@ export interface IVenture extends Document {
   created_by: string;
   fund_wallet: number;
   status: string;
+ 
+  exiting_panding?: {
+    user_id: string;
+    amount: number;
+  }[];
 }
 
 const VentureSchema: Schema = new Schema(
@@ -46,6 +51,20 @@ const VentureSchema: Schema = new Schema(
         },
       },
     ],
+    exiting_panding: [
+      {
+        user_id: {
+          type: Schema.Types.ObjectId,
+          ref: "User",
+          required: true,
+        },
+        amount: {
+          type: Number,
+          required: true,
+          default: 0,
+        },
+      },
+    ],
     requests: [{ type: Schema.Types.ObjectId, ref: "User" }], // Changed from "user" to "User"
 
     // Existing fields
@@ -64,13 +83,9 @@ const VentureSchema: Schema = new Schema(
 );
 
 // Force recompilation to pick up schema changes in development
-// if (process.env.NODE_ENV === "development") {
-//   delete mongoose.models.Venture;
-// }
-// Actually, to be safe and ensure the new schema is used:
-// if (mongoose.models.Venture) {
-//   delete mongoose.models.Venture;
-// }
+if (mongoose.models.Venture) {
+  delete mongoose.models.Venture;
+}
 
 const VentureModel: Model<IVenture> =
   mongoose.models.Venture || mongoose.model<IVenture>("Venture", VentureSchema);

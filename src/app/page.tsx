@@ -140,7 +140,7 @@ const Page = () => {
                       width="12"
                       height="10"
                       rx="1"
-                      fill={scale === i ? "#BF9227" : "#04594A"}
+                      fill={scale === i ? "#04594A" : "#BF9227"}
                       opacity=".7"
                     />
                     <rect
@@ -203,7 +203,7 @@ const Page = () => {
                       width="10"
                       height="10"
                       rx="1.5"
-                      fill={scale === i ? "#BF9227" : "#04594A"}
+                      fill={scale === i ? "#04594A" : "#BF9227"}
                       opacity=".22"
                       transform="rotate(-10 12 50)"
                     />

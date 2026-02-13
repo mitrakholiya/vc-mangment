@@ -275,7 +275,13 @@ const ViewHistory: React.FC<ViewHistoryProps> = ({ id }) => {
                 <Table size="small">
                   <TableHead className="bg-primary">
                     <TableRow>
-                      <TableCell className="font-bold text-white! text-xs">Name</TableCell>
+                      <TableCell className="font-bold text-white! text-xs"
+                      sx={{
+                        position:"sticky",
+                        left:0,
+                        backgroundColor:"#04594A",
+                      }}
+                      >Name</TableCell>
                       <TableCell align="center" className="font-bold text-white! text-xs">
                         Contribution(Hapto)
                       </TableCell>
@@ -302,7 +308,13 @@ const ViewHistory: React.FC<ViewHistoryProps> = ({ id }) => {
                   <TableBody>
                     {usersForMonth.map((user: any) => (
                       <TableRow key={user._id} className="hover:bg-gray-50">
-                        <TableCell className="text-xs font-medium">
+                        <TableCell className="text-xs font-medium"
+                        sx={{
+                          position:"sticky",
+                          left:0,
+                          backgroundColor:"#f9fafb",
+                        }}
+                        >
                           {user.user_id?.name || "Unknown"}
                         </TableCell>
                         <TableCell align="right" className="text-xs">

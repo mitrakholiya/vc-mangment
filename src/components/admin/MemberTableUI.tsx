@@ -458,8 +458,11 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
                 sx={{
                   color: "white",
                   fontWeight: "bold",
+                  position: "sticky",
+                  left: 0,
                   textTransform: "uppercase",
                   fontSize: "11px",
+                  backgroundColor: "#04594A",
                 }}
               >
                 Name
@@ -583,6 +586,9 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
                     maxWidth: "150px",
                     minWidth: "100px",
                     lineHeight: "1.2",
+                    position: "sticky",
+                    left: 0,
+                    backgroundColor: "#f9fafb",
                   }}
                 >
                   {row.user_id?.name || "Unknown"}
@@ -742,10 +748,19 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
             {/* Total Row */}
 
             <TableRow className="bg-primary/20 border-t border-b border-1 border-primary">
+              
+              <TableCell></TableCell>
+               
+           
               <TableCell
-                colSpan={2}
                 align="center"
-                className="text-primary font-bold text-lg"
+                className="text-primary font-bold text-lg "
+                 sx={{
+                  position: "sticky",
+                  left: 0,
+                  backgroundColor: "#04594A",
+                  color: "white",
+                 }}
               >
                 Total
               </TableCell>

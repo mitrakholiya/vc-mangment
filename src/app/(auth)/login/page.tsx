@@ -6,6 +6,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { Input } from "@/components/Input";
 import { CircularProgress } from "@mui/material";
+import Image from "next/image";
 
 const Login = () => {
   const router = useRouter();
@@ -36,10 +37,22 @@ const Login = () => {
     );
   }
   return (
-    <div className="flex h-[100dvh] sm:items-center items-end justify-center sm:bg-background bg-primary sm:px-4">
-      <div className="w-full max-w-md rounded-[30px_30px_0_0] sm:rounded-xl bg-white p-8 shadow-lg border border-gray-100 text-gray-900">
+    <div className="flex h-[100dvh]  flex-col sm:flex-row items-center sm:justify-evenly justify-end bg-transparent sm:px-4 relative">
+      <div className="sm:relative absolute inset-0  z-[-1] sm:top-0 top-[100px]  ">
+        <Image
+          src="/icons/syncera.png"
+          alt="Syncera logo"
+          width={400}
+          height={400}
+          className="object-contain"
+          priority
+        />
+      </div>
+      <div className="absolute inset-0 bg-background z-[-2]"></div>
+
+      <div className="w-full sm:w-1/2 max-w-md rounded-[30px_30px_0_0] sm:rounded-xl bg-white  p-8 shadow-lg border border-gray-100 text-gray-900">
         <div className="mb-8 text-center">
-          <h2 className="text-3xl font-bold text-gray-900 font-secondary">
+          <h2 className="text-3xl font-bold! text-gray-900 font-secondary">
             Welcome&nbsp;
             <span className="text-primary">Back</span>
           </h2>
@@ -69,7 +82,7 @@ const Login = () => {
 
           <div>
             <button
-              className="flex w-full justify-center rounded-md bg-primary px-4 py-3 uppercase  font-semibold text-white shadow-sm transition-transform hover:scale-105 duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary transition-colors"
+              className="flex w-full justify-center rounded-md bg-primary px-4 py-3 uppercase  font-semibold text-white shadow-sm transition-all hover:scale-105 duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary"
               onClick={handleSubmit}
             >
               Log In

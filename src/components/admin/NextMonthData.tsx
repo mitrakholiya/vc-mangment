@@ -41,7 +41,7 @@ const NextMonthData: React.FC<NextMonthDataProps> = ({ id }) => {
 
   if (userVcMonthlyData.length === 0 && !vcMonthly) {
     return (
-      <div className="text-center text-gray-500 py-8 italic border border-dashed rounded-lg bg-gray-50">
+      <div className="text-center text-secondary py-8 italic border border-dashed rounded-lg bg-gray-50">
         Next month data verification not available yet.
         <br />
         <span className="text-xs">
@@ -61,7 +61,7 @@ const NextMonthData: React.FC<NextMonthDataProps> = ({ id }) => {
 
   return (
     <div className="mt-8 mb-4">
-      <Typography variant="h6" className="font-bold text-gray-800 mb-3 px-1">
+      <Typography variant="h6" className="font-bold text-primary mb-3 px-1">
         Next Month Projection ({monthName} {year})
       </Typography>
 
@@ -70,25 +70,31 @@ const NextMonthData: React.FC<NextMonthDataProps> = ({ id }) => {
         className="shadow-sm border rounded-lg overflow-hidden"
       >
         <Table size="small" aria-label="next month table">
-          <TableHead className="bg-blue-50">
+          <TableHead className="bg-primary ">
             <TableRow>
-              <TableCell className="font-bold text-xs" width="40px">
+              <TableCell className="font-bold text-white! text-xs" width="40px">
                 No.
               </TableCell>
-              <TableCell className="font-bold text-xs">Name</TableCell>
-              <TableCell align="right" className="font-bold text-xs">
+              <TableCell className="font-bold text-white! text-xs"
+               sx={{
+                position:"sticky",
+                left:0,
+                backgroundColor:"#04594A",
+               }}
+              >Name</TableCell>
+              <TableCell align="right" className="font-bold text-white! text-xs">
                 Baki Loan
               </TableCell>
-              <TableCell align="right" className="font-bold text-xs">
+              <TableCell align="right" className="font-bold text-white! text-xs">
                 Loan Hapto
               </TableCell>
-              <TableCell align="right" className="font-bold text-xs">
+              <TableCell align="right" className="font-bold text-white! text-xs">
                 Vyaj
               </TableCell>
-              <TableCell align="right" className="font-bold text-xs">
+              <TableCell align="right" className="font-bold text-white! text-xs">
                 Hapto
               </TableCell>
-              <TableCell align="right" className="font-bold text-xs">
+              <TableCell align="right" className="font-bold text-white! text-xs">
                 Total Payable
               </TableCell>
             </TableRow>
@@ -102,7 +108,13 @@ const NextMonthData: React.FC<NextMonthDataProps> = ({ id }) => {
                 <TableCell component="th" scope="row" className="text-xs">
                   {index + 1}
                 </TableCell>
-                <TableCell className="text-xs font-semibold text-gray-700">
+                <TableCell className="text-xs font-semibold text-gray-700"
+                sx={{
+                  position:"sticky",
+                  left:0,
+                  backgroundColor : "#f9fafb",
+                }}
+                >
                   {row.user_id?.name || "Unknown"}
                 </TableCell>
                 <TableCell align="right" className="text-xs text-gray-600">

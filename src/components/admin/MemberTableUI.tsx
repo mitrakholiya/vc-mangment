@@ -297,6 +297,7 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
   const handleOpenApproveDialog = async (id: string, hasLoan: boolean) => {
     // If user has no loan at all, we can approve directly.
     // But if they have a loan (either new or existing), we should show the box.
+    setLoading(true);
     if (!hasLoan) {
       const res = await onApprove(id, 0);
 
@@ -311,6 +312,7 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
       setPartPaymentInput("");
       setIsApproveDialogOpen(true);
     }
+    setLoading(false);
   };
 
   const handleCloseApproveDialog = () => {
@@ -339,8 +341,9 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
     }
 
     // Call mutation with object
-    const res = await onApprove(approveSelectedId, partPayment);
     setLoading(true);
+    const res = await onApprove(approveSelectedId, partPayment);
+    
     if (res?.success === true) {
       toast.success("Approved successfully");
       refetch();

@@ -85,9 +85,12 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
   vcMonthlyData = [],
   vcId,
 }) => {
+  const [loading, setLoading] = React.useState(false);
+
   const { mutateAsync: redoApprovel } = usePutRedoApprove();
 
   const handelRedoApprovel = async (id: string) => {
+    setLoading(true);
     const res = await redoApprovel(id);
     if (res?.success === true) {
       toast.success(res?.message);
@@ -96,6 +99,7 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
       toast.error(res?.message || "Something Went Wrong");
       refetch();
     }
+    setLoading(false);
   };
 
   // Calculate matching VcMonthly record for current view
@@ -167,7 +171,6 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
     }
   }, [vcMonthlyData]);
 
-  const [loading, setLoading] = React.useState(false);
   const [isLoanModalOpen, setIsLoanModalOpen] = React.useState(false);
   const [selectedUserForLoan, setSelectedUserForLoan] = React.useState<
     any | null

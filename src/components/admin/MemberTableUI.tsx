@@ -396,33 +396,39 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
 
   return (
     <div className="mt-4">
-      <div className="flex justify-between items-center px-2 mb-2">
-        <Typography className="text-sm font-extrabold text-gray-700">
-          {monthName} {year}
-        </Typography>
-        <div className="flex gap-2">
-          <IconButton
-            onClick={() => handleShare("download")}
-            size="small"
-            className="bg-gray-100 hover:bg-gray-200 text-gray-600"
-            title="Download PDF"
-          >
-            <Download className="w-4 h-4" />
-          </IconButton>
-          <IconButton
-            onClick={() => handleShare("share")}
-            size="small"
-            className="bg-gray-100 hover:bg-gray-200 text-gray-600"
-            title="Share PDF"
-          >
-            <Share2 className="w-4 h-4" />
-          </IconButton>
+      <div className="flex justify-between items-center px-2 mb-2 border-b border-gray-100 pb-2 ">
+        <h4 className="text-xl font-secondary! font-bold text-secondary tracking-widest uppercase">
+          Member Table
+        </h4>
+        {/* <div className="h-px bg-primary flex-1 mx-3"></div> */}
+        <div className="flex items-center gap-3">
+          {/* <Typography className="text-sm font-extrabold text-gray-500 uppercase tracking-tighter">
+            {monthName} {year}
+          </Typography> */}
+          <div className="flex gap-2 border-l pl-3 border-gray-200">
+            <IconButton
+              onClick={() => handleShare("download")}
+              size="small"
+              className="bg-gray-100 hover:bg-gray-200 text-gray-600"
+              title="Download PDF"
+            >
+              <Download className="w-4 h-4" />
+            </IconButton>
+            <IconButton
+              onClick={() => handleShare("share")}
+              size="small"
+              className="bg-gray-100 hover:bg-gray-200 text-gray-600"
+              title="Share PDF"
+            >
+              <Share2 className="w-4 h-4" />
+            </IconButton>
+          </div>
         </div>
       </div>
       <TableContainer
         // ...
         component={Paper}
-        className="shadow-md rounded-lg text-[8px] my-[10px]"
+        className="shadow-md rounded-lg text-[8px] my-[10px] "
         // sx={{ overflow: "hidden" }}
       >
         <Table
@@ -436,41 +442,127 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
           size="small"
           aria-label="member table"
         >
-          <TableHead className="bg-gray-100">
+          <TableHead className="bg-primary">
             <TableRow>
-              <TableCell sx={{ width: "25px", p: "2px" }}>
-                <strong>No.</strong>
+              <TableCell
+                sx={{
+                  color: "white",
+                  fontWeight: "bold",
+                  textTransform: "uppercase",
+                  fontSize: "11px",
+                }}
+              >
+                No.
               </TableCell>
-              <TableCell sx={{ width: "120px", p: "2px" }}>
-                <strong>Name</strong>
+              <TableCell
+                sx={{
+                  color: "white",
+                  fontWeight: "bold",
+                  textTransform: "uppercase",
+                  fontSize: "11px",
+                }}
+              >
+                Name
               </TableCell>
-              <TableCell align="center" sx={{ width: "50px", p: "2px" }}>
-                <strong>Monthly hapto</strong>
+              <TableCell
+                align="center"
+                sx={{
+                  color: "white",
+                  fontWeight: "bold",
+                  textTransform: "uppercase",
+                  fontSize: "11px",
+                }}
+              >
+                Monthly hapto
               </TableCell>
-              <TableCell align="center" sx={{ width: "60px", p: "2px" }}>
-                <strong>Total Loan</strong>
+              <TableCell
+                align="center"
+                sx={{
+                  color: "white",
+                  fontWeight: "bold",
+                  textTransform: "uppercase",
+                  fontSize: "11px",
+                }}
+              >
+                Total Loan
               </TableCell>
-              <TableCell align="center" sx={{ width: "80px", p: "2px" }}>
-                <strong>Last Pending Loan</strong>
+              <TableCell
+                align="center"
+                sx={{
+                  color: "white",
+                  fontWeight: "bold",
+                  textTransform: "uppercase",
+                  fontSize: "11px",
+                }}
+              >
+                Last Pending Loan
               </TableCell>
-              <TableCell align="center" sx={{ width: "50px", p: "2px" }}>
-                <strong>Loan Hapto</strong>
+              <TableCell
+                align="center"
+                sx={{
+                  color: "white",
+                  fontWeight: "bold",
+                  textTransform: "uppercase",
+                  fontSize: "11px",
+                }}
+              >
+                Loan Hapto
               </TableCell>
-              <TableCell align="center" sx={{ width: "50px", p: "2px" }}>
-                <strong>Loan Vyaj</strong>
+              <TableCell
+                align="center"
+                sx={{
+                  color: "white",
+                  fontWeight: "bold",
+                  textTransform: "uppercase",
+                  fontSize: "11px",
+                }}
+              >
+                Loan Vyaj
               </TableCell>
-              <TableCell align="center" sx={{ width: "50px", p: "2px" }}>
-                <strong>Part Payment </strong>
+              <TableCell
+                align="center"
+                sx={{
+                  color: "white",
+                  fontWeight: "bold",
+                  textTransform: "uppercase",
+                  fontSize: "11px",
+                }}
+              >
+                Part Payment
               </TableCell>
-              <TableCell align="center" sx={{ width: "50px", p: "2px" }}>
-                <strong>Remaining Loan</strong>
+              <TableCell
+                align="center"
+                sx={{
+                  color: "white",
+                  fontWeight: "bold",
+                  textTransform: "uppercase",
+                  fontSize: "11px",
+                }}
+              >
+                Remaining Loan
               </TableCell>
-              <TableCell align="center" sx={{ width: "60px", p: "2px" }}>
-                <strong>Total Payable</strong>
+              <TableCell
+                align="center"
+                sx={{
+                  color: "white",
+                  fontWeight: "bold",
+                  textTransform: "uppercase",
+                  fontSize: "11px",
+                }}
+              >
+                Total Payable
               </TableCell>
               {!done && (
-                <TableCell align="center" sx={{ width: "80px", p: "2px" }}>
-                  <strong>Action</strong>
+                <TableCell
+                  align="center"
+                  sx={{
+                    color: "white",
+                    fontWeight: "bold",
+                    textTransform: "uppercase",
+                    fontSize: "11px",
+                  }}
+                >
+                  Action
                 </TableCell>
               )}
             </TableRow>
@@ -482,66 +574,81 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                 className="hover:bg-gray-50 transition-colors"
               >
-                <TableCell component="th" scope="row">
+                <TableCell component="th" scope="row" className="text-gray-500">
                   {index + 1}
                 </TableCell>
                 <TableCell
+                  className="text-primary font-bold"
                   sx={{
-                    maxWidth: "150px", // Increased from 80px
+                    maxWidth: "150px",
                     minWidth: "100px",
                     lineHeight: "1.2",
-                    // fontSize: "0.75rem",
-                    fontWeight: 500,
                   }}
                 >
                   {row.user_id?.name || "Unknown"}
                 </TableCell>
-                <TableCell align="right">
+                <TableCell align="right" className="text-gray-700">
                   ₹{row.monthly_contribution.toLocaleString()}
                 </TableCell>
-                <TableCell align="right">
+                <TableCell align="right" className="text-gray-400">
                   {row.loan_amount > 0
                     ? `₹${row.loan_amount.toLocaleString()}`
-                    : "-"}
+                    : "—"}
                 </TableCell>
-                <TableCell align="right">
+                <TableCell
+                  align="right"
+                  className="text-secondary! font-semibold"
+                >
                   {row.last_month_remaining_loan > 0
                     ? `₹${row.last_month_remaining_loan.toLocaleString()}`
-                    : "-"}
+                    : "—"}
                 </TableCell>
-                <TableCell align="right">
+                <TableCell
+                  align="right"
+                  className="text-gray-700 font-semibold"
+                >
                   {row.loan_monthly_emi > 0
                     ? `₹${row.loan_monthly_emi.toLocaleString()}`
-                    : "-"}
+                    : "—"}
                 </TableCell>
-                <TableCell align="right">
+                <TableCell
+                  align="right"
+                  className="text-gray-700 font-semibold"
+                >
                   {row.loan_interest > 0
                     ? `₹${row.loan_interest.toLocaleString()}`
-                    : "-"}
+                    : "—"}
                 </TableCell>
-                <TableCell align="right">
+                <TableCell align="right" className="text-gray-400">
                   {row.part_payment > 0
                     ? `₹${row.part_payment.toLocaleString()}`
-                    : "-"}
+                    : "—"}
                 </TableCell>
-                <TableCell align="right">
+                <TableCell
+                  align="right"
+                  className={
+                    row.remaining_loan > 0
+                      ? "text-red-500! font-bold"
+                      : "text-gray-400"
+                  }
+                >
                   {row.remaining_loan > 0
                     ? `₹${row.remaining_loan.toLocaleString()}`
-                    : "-"}
+                    : "—"}
                 </TableCell>
-                <TableCell align="right">
+                <TableCell align="right" className="text-primary font-bold">
                   ₹{row.total_payable.toLocaleString()}
                 </TableCell>
 
                 {/* IN vc monthly lock = false than show */}
                 {!done && (
                   <TableCell align="center">
-                    <div className="flex items-center justify-center gap-1">
+                    <div className="flex items-center justify-center gap-2">
                       {row.status !== "approved" && (
                         <>
-                          <span
-                            className="px-3 py-0.5 rounded-xl text-primary bg-gray-100 border-[1px] text-[9px] font-medium cursor-pointer"
-                            title="Direct Approve (No Part Payment)"
+                          <div
+                            className="w-8 h-8 rounded-full text-secondary/80 flex items-center justify-center cursor-pointer hover:scale-110 transition-transform "
+                            title="Direct Approve"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleDirectApprovel(row._id);
@@ -551,7 +658,7 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
                               xmlns="http://www.w3.org/2000/svg"
                               viewBox="0 0 24 24"
                               fill="currentColor"
-                              className="w-4 h-4"
+                              className="w-8 h-8"
                             >
                               <path
                                 fillRule="evenodd"
@@ -559,16 +666,10 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
                                 clipRule="evenodd"
                               />
                             </svg>
-                          </span>
+                          </div>
 
-                          <span
-                            className={`px-3 py-0.5 rounded-xl text-[9px] text-primary font-medium cursor-pointer ${
-                              row.status === "pending"
-                                ? "bg-yellow-500 text-white"
-                                : row.status === "paid"
-                                  ? "bg-green-100 text-green-800"
-                                  : "bg-gray-100 border-[1px]"
-                            }`}
+                          <div
+                            className="w-8 h-8 rounded-full text-primary flex items-center justify-center cursor-pointer hover:scale-110 transition-transform "
                             title="Approve with Part Payment"
                             onClick={() =>
                               handleOpenApproveDialog(
@@ -577,34 +678,31 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
                               )
                             }
                           >
-                            {(row.status === "pending" ||
-                              row.status === "none") && (
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                strokeWidth={1.5}
-                                stroke="currentColor"
-                                className="w-4 h-4"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  d="M12 4.5v15m7.5-7.5h-15"
-                                />
-                              </svg>
-                            )}
-                          </span>
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              strokeWidth={2}
+                              stroke="currentColor"
+                              className="w-5 h-5"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M12 4.5v15m7.5-7.5h-15"
+                              />
+                            </svg>
+                          </div>
                         </>
                       )}
                       {row.status === "approved" && (
                         <>
-                          <span className="flex items-center text-green-600 text-xs font-bold">
+                          <div className="w-8 h-8 rounded-full text-primary flex items-center justify-center cursor-pointer hover:scale-110 transition-transform ">
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               viewBox="0 0 24 24"
                               fill="currentColor"
-                              className="w-4 h-4 ml-1"
+                              className="w-8 h-8"
                             >
                               <path
                                 fillRule="evenodd"
@@ -612,21 +710,20 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
                                 clipRule="evenodd"
                               />
                             </svg>
-                          </span>
+                          </div>
 
-                          <IconButton
+                          <div
                             onClick={() => handelRedoApprovel(row._id)}
-                            size="small"
-                            className="p-1 text-gray-400 hover:text-blue-500"
-                            title="Refresh"
+                            className="w-8 h-8 rounded-full text-primary flex items-center justify-center cursor-pointer hover:scale-110 transition-transform "
+                            title="Undo/Refresh"
                           >
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               fill="none"
                               viewBox="0 0 24 24"
-                              strokeWidth={1.5}
+                              strokeWidth={2}
                               stroke="currentColor"
-                              className="w-3 h-3"
+                              className="w-4 h-4"
                             >
                               <path
                                 strokeLinecap="round"
@@ -634,7 +731,7 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
                                 d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
                               />
                             </svg>
-                          </IconButton>
+                          </div>
                         </>
                       )}
                     </div>
@@ -644,58 +741,51 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
             ))}
             {/* Total Row */}
 
-            <TableRow className="bg-gray-200 font-bold">
-              <TableCell colSpan={2} align="center">
-                <strong>Total</strong>
+            <TableRow className="bg-primary/20 border-t border-b border-1 border-primary">
+              <TableCell
+                colSpan={2}
+                align="center"
+                className="text-primary font-bold text-lg"
+              >
+                Total
               </TableCell>
-              <TableCell align="right">
-                <strong>₹{totalMonthlyContribution.toLocaleString()}</strong>
+              <TableCell align="right" className="text-primary font-bold">
+                ₹{totalMonthlyContribution.toLocaleString()}
               </TableCell>
-              <TableCell align="right">
-                <strong>
-                  {totalLoanAmount > 0
-                    ? `₹${totalLoanAmount.toLocaleString()}`
-                    : "-"}
-                </strong>
+              <TableCell align="right" className="text-gray-400">
+                {totalLoanAmount > 0
+                  ? `₹${totalLoanAmount.toLocaleString()}`
+                  : "—"}
               </TableCell>
-              <TableCell align="right">
-                <strong>
-                  {totalLastPendingLoan > 0
-                    ? `₹${totalLastPendingLoan.toLocaleString()}`
-                    : "-"}
-                </strong>
+              <TableCell align="right" className="text-primary font-bold">
+                {totalLastPendingLoan > 0
+                  ? `₹${totalLastPendingLoan.toLocaleString()}`
+                  : "—"}
               </TableCell>
-              <TableCell align="right">
-                <strong>
-                  {totalLoanEmi > 0 ? `₹${totalLoanEmi.toLocaleString()}` : "-"}
-                </strong>
+              <TableCell align="right" className="text-primary font-bold">
+                {totalLoanEmi > 0 ? `₹${totalLoanEmi.toLocaleString()}` : "—"}
               </TableCell>
-              <TableCell align="right">
-                <strong>
-                  {totalLoanInterest > 0
-                    ? `₹${totalLoanInterest.toLocaleString()}`
-                    : "-"}
-                </strong>
+              <TableCell align="right" className="text-primary font-bold">
+                {totalLoanInterest > 0
+                  ? `₹${totalLoanInterest.toLocaleString()}`
+                  : "—"}
               </TableCell>
-              <TableCell align="right">
-                <strong>
-                  {totalPartPayment > 0
-                    ? `₹${totalPartPayment.toLocaleString()}`
-                    : "-"}
-                </strong>
+              <TableCell align="right" className="text-primary font-bold">
+                {totalPartPayment > 0
+                  ? `₹${totalPartPayment.toLocaleString()}`
+                  : "—"}
               </TableCell>
-              <TableCell align="right">
-                <strong>
-                  {totalRemainingLoan > 0
-                    ? `₹${totalRemainingLoan.toLocaleString()}`
-                    : "-"}
-                </strong>
+              <TableCell align="right" className="text-primary font-bold">
+                {totalRemainingLoan > 0
+                  ? `₹${totalRemainingLoan.toLocaleString()}`
+                  : "—"}
               </TableCell>
-              <TableCell align="right">
-                <strong>₹{totalPayable.toLocaleString()}</strong>
+              <TableCell
+                align="right"
+                className="text-primary font-bold text-lg"
+              >
+                ₹{totalPayable.toLocaleString()}
               </TableCell>
-              {/* Empty cell for Action column in Total Row */}
-
               {!done && <TableCell></TableCell>}
             </TableRow>
           </TableBody>
@@ -1037,13 +1127,13 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
               return (
                 <TableContainer
                   component={Paper}
-                  className="shadow-md rounded-lg mb-8"
+                  className="shadow-md rounded-2 mb-8"
                 >
                   <Table size="small">
-                    <TableHead className="bg-gray-300">
+                    <TableHead className="bg-primary">
                       <TableRow>
                         <TableCell
-                          className="text-white font-bold"
+                          className="text-white! font-bold"
                           colSpan={2}
                           align="center"
                         >
@@ -1162,7 +1252,7 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
                           <TableRow className="bg-gray-100">
                             <TableCell
                               colSpan={2}
-                              className="font-bold text-xs text-gray-600"
+                              className="font-bold text-xs "
                             >
                               New Loans Distributed
                             </TableCell>
@@ -1176,12 +1266,12 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
                                 )?.user_id.name || "Unknown User";
                               return (
                                 <TableRow key={idx}>
-                                  <TableCell className="pl-6 text-sm">
+                                  <TableCell className="pl-6 text-sm text-secodary!">
                                     {userName}
                                   </TableCell>
                                   <TableCell
                                     align="right"
-                                    className="text-red-600 font-medium"
+                                    className="text-yellow-600! font-medium "
                                   >
                                     - ₹{loan.loan_amount?.toLocaleString()}
                                   </TableCell>
@@ -1275,9 +1365,9 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
         <div className="flex justify-center gap-4 my-8 flex-wrap">
           <Button
             variant="contained"
-            color="secondary"
+            color="primary"
             onClick={handleOpenLoanDialog}
-            className="shadow-md font-bold"
+            className="shadow-md font-bold capitalize!"
             startIcon={
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -1301,9 +1391,9 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
           {!done && (
             <Button
               variant="contained"
-              color="primary"
+              color="secondary"
               onClick={() => handleLock()}
-              className="shadow-md font-bold"
+              className="shadow-md text-white! capitalize! font-bold"
             >
               Finalize this month
             </Button>

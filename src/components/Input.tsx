@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import TextField from "@mui/material/TextField";
+import { TextField, SxProps, Theme } from "@mui/material";
 
 type InputProps = {
   type: string;
@@ -8,6 +8,7 @@ type InputProps = {
   value: string | number;
   setValue: (value: string) => void;
   variant?: "outlined" | "filled" | "standard";
+  sx?: SxProps<Theme>;
 };
 
 export const Input = ({
@@ -16,6 +17,7 @@ export const Input = ({
   value,
   setValue,
   variant = "outlined",
+  sx,
 }: InputProps) => {
   return (
     <TextField
@@ -26,6 +28,10 @@ export const Input = ({
       onChange={(e) => setValue(e.target.value)}
       size="small"
       fullWidth
+      sx={{
+        "& .MuiInputLabel-root": { color: "teal" },
+        "& .MuiInputBase-input::placeholder": { color: "teal", opacity: 1 },
+      }}
     />
   );
 };

@@ -32,9 +32,12 @@ const Page: React.FC = () => {
     <div className="min-h-screen text-black sm:p-4 bg-background">
       <div className="bg-background sm:bg-white w-full rounded-lg p-2 space-y-4 max-w-2xl mx-auto">
         <div className="space-y-4 border-b pb-6">
-          <h3 className="text-lg font-medium text-gray-900">
-            Join Existing Venture
-          </h3>
+          <div className=" flex items-center gap-2">
+            <h3 className="text-lg font-semibold text-gray-900 whitespace-nowrap">
+              Join Existing Venture
+            </h3>
+            <div className="h-px  bg-secondary flex-1"></div>
+          </div>
           <div className="flex gap-2">
             <div className="flex-1">
               <Input
@@ -47,7 +50,7 @@ const Page: React.FC = () => {
             <button
               onClick={handleJoin}
               disabled={isJoining}
-              className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="bg-primary hover:bg-primary/80 text-white px-6 py-2 rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {isJoining ? "Joining..." : "Join"}
             </button>

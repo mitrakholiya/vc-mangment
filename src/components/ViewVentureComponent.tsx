@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import JoinRequestsPopup from "./JoinRequestsPopup";
 import { useRequestToPending } from "@/hooks/contribution/useContribution";
 import toast from "react-hot-toast";
+import Link from "next/link";
 
 interface VentureData {
   name: string;
@@ -99,15 +100,37 @@ export default function ViewVentureComponent({
       {/* Card */}
       <div className="bg-white rounded-xl shadow-md border border-gray-200">
         {/* Header */}
-        <div className="bg-secondary rounded-t-xl px-4 py-3">
+        <div className="bg-primary rounded-t-xl px-4 py-3">
           <div className="flex justify-between items-center">
             <div>
-              <h2 className="text-lg font-semibold text-white">{data.name}</h2>
-              <h2 className="text-sm font-semibold text-white"
-              onClick = {()=>handleCopy(data?.vc_id)}
-              >{data.vc_id}</h2>
+              <h2 className="text-xl font-semibold text-white">{data.name}</h2>
+              <div
+                className="flex items-center gap-1.5 cursor-pointer group w-fit pt-1"
+                onClick={() => handleCopy(data?.vc_id)}
+              >
+                <h2 className=" font-semibold text-white text-md">
+                  VC ID : {data.vc_id.slice(0, 3)}...
+                </h2>
+                <div className=" rounded-sm bg-secondary/20 p-1 ">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="text-secondary/60 group-hover:scale-110 transition-transform"
+                  >
+                    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+                    <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+                  </svg>
+                </div>
+              </div>
               {data.month && data.year && (
-                <p className="text-gray-200 text-sm">
+                <p className="text-gray-200 text-[16px] py-1">
                   {getMonthName(data.month)} {data.year}
                 </p>
               )}
@@ -119,7 +142,7 @@ export default function ViewVentureComponent({
                 </span>
               )} */}
               <span
-                className={`text-[10px] font-bold px-2 py-0.5 rounded capitalize ${getStatusColor(data.status)}`}
+                className={`text-xs font-bold px-2 py-0.5 rounded capitalize ${getStatusColor(data.status)}`}
               >
                 {data.status || "none"}
               </span>
@@ -130,49 +153,61 @@ export default function ViewVentureComponent({
         {/* Content */}
         <div className="">
           {/* Unified Stats */}
-          <div className="bg-gray-50 rounded-lg p-2.5 space-y-1.5 font-semibold">
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-500">Monthly Hapto</span>
-              <span className="font-semibold text-gray-800">
+          <div className="bg-gray-50 rounded-lg p-2.5 space-y-2 font-semibold">
+            <div className="flex justify-between text-[16px]">
+              <span className="text-gray-700">Monthly Hapto</span>
+              <span className="font-extrabold text-primary">
                 ₹{data.monthly_hapto?.toLocaleString() || 0}
               </span>
             </div>
 
-              <div className="flex justify-between text-sm">
-              <span className="text-gray-500">Loan Amount</span>
-              <span className="font-semibold text-gray-800">
+            <div className="flex justify-between text-[16px]">
+              <span className="text-gray-700">Loan Amount</span>
+              <span className="font-extrabold text-primary">
                 ₹{data.total_loan_amount?.toLocaleString() || 0}
               </span>
             </div>
 
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-500">Remaining Loan</span>
-              <span className="font-semibold text-gray-800">
+            <div className="flex justify-between text-[16px]">
+              <span className="text-gray-700">Remaining Loan</span>
+              <span className="font-extrabold text-primary">
                 ₹{data.total_remaining_amount?.toLocaleString() || 0}
               </span>
             </div>
 
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-500">
-                Interest ({data.interest_rate}%)
+            <div className="flex justify-between text-[16px]">
+              <span className="text-gray-700">
+                Interest (
+                  <span className="text-secondary font-extrabold">{data.interest_rate}%</span>
+                )
               </span>
-              <span className="font-semibold text-gray-800">
+            <span className="font-extrabold text-primary">
                 ₹{data.total_interest_amount?.toLocaleString() || 0}
               </span>
             </div>
 
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-500">Total Repayment</span>
-              <span className="font-semibold text-gray-800">
+            <div className="flex justify-between text-[16px]  ">
+              <span className="text-gray-700">Part Payment</span>
+              <span className="font-extrabold text-primary">
+                ₹{data.loan_part_payment?.toLocaleString() || 0}
+              </span>
+            </div>
+
+            <div className="flex justify-between text-[16px] border-t py-2 border-gray-400">
+              <span className="text-secondary">Total Repayment</span>
+              <span className="font-extrabold text-secondary">
                 ₹{data.total_repayment_amount?.toLocaleString() || 0}
               </span>
             </div>
 
-            <div className="flex justify-between text-sm  ">
-              <span className="text-gray-500">Part Payment</span>
-              <span className="font-semibold text-gray-800">
-                ₹{data.loan_part_payment?.toLocaleString() || 0}
-              </span>
+
+            <div className="flex justify-between text-lg">
+              <Link
+                href={`/view-venture/history/${data.vc_id}`}
+                className="bg-primary text-white w-full text-center rounded-xl p-3"
+              >
+                History
+              </Link>
             </div>
           </div>
 
@@ -225,6 +260,7 @@ export default function ViewVentureComponent({
             {isPending ? "Processing..." : "Pay Monthly Hapto"}
           </button> */}
         </div>
+
         <JoinRequestsPopup
           open={reqpopup}
           onClose={() => setReqpopup(false)}

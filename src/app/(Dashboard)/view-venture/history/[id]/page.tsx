@@ -13,7 +13,7 @@ const HistoryPage = () => {
     <div className="p-4 md:p-6 max-w-7xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <div
-          className="flex items-center gap-2 cursor-pointer rounded-full p-2 bg-gray-800 hover:bg-gray-700 transition-colors"
+          className="flex items-center gap-2 cursor-pointer rounded-full p-2 bg-primary hover:bg-primary/80 transition-colors"
           onClick={() => router.back()}
         >
             <svg

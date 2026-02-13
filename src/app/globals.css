@@ -1,14 +1,88 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #374151;
-  --color-secondary: #6b7280;
+  --color-primary: #04594A;
+  --color-secondary: #BF9227;
   --color-background: #ffffff;
   --color-surface: #f9fafb;
   --color-muted: #9ca3af;
 }
 
+/* -------------------------------------------------------------
+   Global overrides: map common text-* (non-secondary) and
+   gray background utilities to the primary color so the
+   new theme applies consistently without editing every file.
+   ------------------------------------------------------------- */
 
+/* Text color overrides (exclude text-secondary) */
+/* .text-black,
+.text-white,
+.text-gray-50,
+.text-gray-100,
+.text-gray-200,
+.text-gray-300,
+.text-gray-400,
+.text-gray-500,
+.text-gray-600,
+.text-gray-700,
+.text-gray-800,
+.text-gray-900,
+.text-slate-300,
+.text-slate-400,
+.text-slate-500,
+.text-slate-600,
+.text-slate-700,
+.text-zinc-300,
+.text-zinc-400,
+.text-zinc-500,
+.text-zinc-600,
+.text-zinc-700,
+.text-neutral-300,
+.text-neutral-400,
+.text-neutral-500,
+.text-neutral-600,
+.text-neutral-700,
+.text-blue-600,
+.text-blue-700,
+.text-green-600,
+.text-green-700,
+.text-red-600,
+.text-yellow-900,
+.text-amber-900,
+.text-purple-700,
+.text-pink-600,
+.text-cyan-600,
+.text-teal-600 {
+  color: var(--color-primary) !important;
+} */
+
+/* Background (gray) -> subtle primary tint */
+/* .bg-gray-50,
+.bg-gray-100,
+.bg-gray-200 {
+  background-color: rgba(4,89,74,0.06) !important; 
+} */
+
+/* Dark gray backgrounds -> solid primary */
+/* .bg-gray-700,
+.bg-gray-800,
+.bg-gray-900,
+.bg-gray-900\/80 {
+  background-color: var(--color-primary) !important;
+} */
+
+/* Gradient utility overrides */
+/* .from-gray-100 { --tw-gradient-from: rgba(4,89,74,0.06) !important; }
+.to-gray-200 { --tw-gradient-to: rgba(4,89,74,0.08) !important; } */
+
+/* Hover/bg variants */
+/* .hover\:bg-gray-50:hover { background-color: rgba(4,89,74,0.06) !important; }
+.hover\:bg-gray-800:hover { background-color: var(--color-primary) !important; } */
+
+.font-secondary {
+  font-family: "DM Serif Display", serif;
+  font-weight: 500;
+}
 
 .hide-scrollbar {
   overflow: auto;

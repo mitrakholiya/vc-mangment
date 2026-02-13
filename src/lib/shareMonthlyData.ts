@@ -39,24 +39,39 @@ export const shareMonthlyPdf = async (
   try {
     const doc = new jsPDF();
 
+    // Theme Colors (RGB)
+    const PRIMARY_COLOR: [number, number, number] = [4, 89, 74]; // #04594A
+    const SECONDARY_COLOR: [number, number, number] = [191, 146, 39]; // #BF9227
+
     // Title
-    doc.setFontSize(18);
-    doc.text(ventureName, 14, 22);
+    doc.setTextColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(22);
+    doc.text(ventureName.toUpperCase(), 14, 22);
+
+    // Decorative line
+    doc.setDrawColor(PRIMARY_COLOR[0], PRIMARY_COLOR[1], PRIMARY_COLOR[2]);
+    doc.setLineWidth(0.5);
+    doc.line(14, 25, 196, 25);
+
+    // Subtitle
+    doc.setTextColor(100, 100, 100);
+    doc.setFont("helvetica", "normal");
     doc.setFontSize(14);
-    doc.text(`${monthName} ${year} - Monthly Summary`, 14, 30);
+    doc.text(`${monthName} ${year} - Monthly Summary`, 14, 32);
 
     // Prepare Table Data
     const tableColumn = [
       "No",
       "Name",
       "Hapto",
-      "Loan",
-      "Last Pend",
-      "L. Hapto",
-      "Vyaj",
-      "Part Pay",
-      "Rem Loan",
-      "Payable",
+      "Total Loan",
+      "Last Pending Loan",
+      "Loan Hapto",
+      "Loan Vyaj",
+      "Part Payment",
+      "Baki Loan",
+      "Total Hapto",
     ];
 
     const tableRows: any[] = [];
@@ -94,18 +109,27 @@ export const shareMonthlyPdf = async (
       data.reduce((sum, r) => sum + r.remaining_loan, 0).toLocaleString(),
       data.reduce((sum, r) => sum + r.total_payable, 0).toLocaleString(),
     ];
-    tableRows.push(totalRow);
-
     autoTable(doc, {
       head: [tableColumn],
       body: tableRows,
+      foot: [totalRow],
       startY: 40,
       theme: "grid",
-      styles: { fontSize: 8, cellPadding: 2 },
-      headStyles: { fillColor: [66, 66, 66] },
+      styles: {
+        fontSize: 8,
+        cellPadding: 2,
+        font: "helvetica",
+        lineWidth: 0.1,
+        lineColor: [0, 0, 0],
+      },
+      headStyles: {
+        fillColor: PRIMARY_COLOR,
+        textColor: [255, 255, 255],
+        fontStyle: "bold",
+      },
       footStyles: {
-        fillColor: [240, 240, 240],
-        textColor: [0, 0, 0],
+        fillColor: PRIMARY_COLOR,
+        textColor: [255, 255, 255],
         fontStyle: "bold",
       },
       showFoot: "lastPage",
@@ -129,8 +153,18 @@ export const shareMonthlyPdf = async (
         body: loanRows,
         startY: currentY + 5,
         theme: "grid",
-        styles: { fontSize: 10, cellPadding: 3 },
-        headStyles: { fillColor: [40, 40, 40] }, // Red header for loans
+        styles: {
+          fontSize: 10,
+          cellPadding: 3,
+          font: "helvetica",
+          lineWidth: 0.1,
+          lineColor: [0, 0, 0],
+        },
+        headStyles: {
+          fillColor: SECONDARY_COLOR,
+          textColor: [255, 255, 255],
+          fontStyle: "bold",
+        }, // Gold/Secondary header for loans
       });
 
       currentY = (doc as any).lastAutoTable.finalY + 10;
@@ -167,12 +201,22 @@ export const shareMonthlyPdf = async (
         body: summaryBody,
         startY: currentY,
         theme: "grid",
-        styles: { fontSize: 10, cellPadding: 3 },
+        styles: {
+          fontSize: 10,
+          cellPadding: 3,
+          font: "helvetica",
+          lineWidth: 0.1,
+          lineColor: [0, 0, 0],
+        },
         columnStyles: {
           0: { cellWidth: 100 },
           1: { cellWidth: 50, halign: "right" },
         },
-        headStyles: { fillColor: [40, 40, 40] },
+        headStyles: {
+          fillColor: PRIMARY_COLOR,
+          textColor: [255, 255, 255],
+          fontStyle: "bold",
+        },
       });
     }
 

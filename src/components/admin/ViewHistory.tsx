@@ -63,10 +63,13 @@ const ViewHistory: React.FC<ViewHistoryProps> = ({ id }) => {
   };
 
   return (
-    <div className="mt-8 space-y-6">
-      <h6 className="font-bold text-gray-800 text-xl px-1 mb-4">
-        Venture History
-      </h6>
+    <div className=" space-y-6">
+      <div className="flex items-center gap-2">
+        <h6 className="font-bold text-3xl px-1 mb-4 font-secondary font-extrabold!">
+          Venture <span className="text-primary">History</span>
+        </h6>
+        <div className="h-px bg-primary flex-1"></div>
+      </div>
 
       {vcMonthlyList.map((monthRecord: any) => {
         const monthName = getMonthName(monthRecord.month);
@@ -130,17 +133,17 @@ const ViewHistory: React.FC<ViewHistoryProps> = ({ id }) => {
               <div className="p-4 bg-white border-b">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
                   <div>
-                    <span className="text-gray-500 block">Opening Balance</span>
+                    <span className="text-primary block">Opening Balance</span>
                     <span className="font-bold text-lg">
                       ₹
                       {monthRecord.last_month_remaining_amount?.toLocaleString()}
                     </span>
                   </div>
                   <div>
-                    <span className="text-green-600 block">
+                    <span className="text-green-600 block text-right">
                       Total Collected
                     </span>
-                    <span className="font-bold text-lg text-green-700">
+                    <span className="font-bold block text-lg text-green-700 text-right">
                       ₹
                       {(
                         (monthRecord.total_monthly_contribution || 0) +
@@ -151,8 +154,8 @@ const ViewHistory: React.FC<ViewHistoryProps> = ({ id }) => {
                     </span>
                   </div>
                   <div>
-                    <span className="text-gray-800 block">New Loans</span>
-                    <span className="font-bold text-lg text-gray-800">
+                    <span className="text-secondary block">New Loans</span>
+                    <span className="font-bold text-lg  text-secondary">
                       ₹
                       {monthRecord.loans
                         ?.reduce(
@@ -164,8 +167,10 @@ const ViewHistory: React.FC<ViewHistoryProps> = ({ id }) => {
                     </span>
                   </div>
                   <div>
-                    <span className="text-gray-800 block">Final Remaining</span>
-                    <span className="font-bold text-lg">
+                    <span className="text-primary block text-right">
+                      Final Remaining
+                    </span>
+                    <span className="font-bold text-lg text-right block">
                       ₹{monthRecord.remaining_amount?.toLocaleString()}
                     </span>
                   </div>
@@ -178,34 +183,34 @@ const ViewHistory: React.FC<ViewHistoryProps> = ({ id }) => {
                 elevation={0}
                 className="mb-4 border-b"
               >
-                <Typography className="p-3 font-bold text-sm bg-gray-50 text-gray-700">
+                <Typography className="p-3 font-bold! text-sm bg-gray-50 text-primary ">
                   VC Monthly Summary
                 </Typography>
                 <Table size="small">
-                  <TableHead className="bg-gray-100">
+                  <TableHead className="bg-primary  ">
                     <TableRow>
-                      <TableCell align="center" className="font-bold text-xs">
+                      <TableCell align="center" className="font-bold text-white! text-xs">
                         Opening Balance
                       </TableCell>
-                      <TableCell align="center" className="font-bold text-xs">
+                      <TableCell align="center" className="font-bold text-white! text-xs">
                         Total Hapto
                       </TableCell>
-                      <TableCell align="center" className="font-bold text-xs">
+                      <TableCell align="center" className="font-bold text-white! text-xs">
                         Total Interest
                       </TableCell>
-                      <TableCell align="center" className="font-bold text-xs">
+                      <TableCell align="center" className="font-bold text-white! text-xs">
                         Total Loan Hapto
                       </TableCell>
-                      <TableCell align="center" className="font-bold text-xs">
+                      <TableCell align="center" className="font-bold text-white! text-xs">
                         Part Payment
                       </TableCell>
-                      <TableCell align="center" className="font-bold text-xs">
+                      <TableCell align="center" className="font-bold text-white! text-xs">
                         Total Fund
                       </TableCell>
-                      <TableCell align="center" className="font-bold text-xs">
+                      <TableCell align="center" className="font-bold text-white! text-xs">
                         New Loans
                       </TableCell>
-                      <TableCell align="center" className="font-bold text-xs">
+                      <TableCell align="center" className="font-bold text-white! text-xs">
                         Final Balance
                       </TableCell>
                     </TableRow>
@@ -268,28 +273,28 @@ const ViewHistory: React.FC<ViewHistoryProps> = ({ id }) => {
               {/* User Table */}
               <TableContainer component={Paper} elevation={0}>
                 <Table size="small">
-                  <TableHead className="bg-gray-100">
+                  <TableHead className="bg-primary">
                     <TableRow>
-                      <TableCell className="font-bold text-xs">Name</TableCell>
-                      <TableCell align="center" className="font-bold text-xs">
+                      <TableCell className="font-bold text-white! text-xs">Name</TableCell>
+                      <TableCell align="center" className="font-bold text-white! text-xs">
                         Contribution(Hapto)
                       </TableCell>
-                      <TableCell align="center" className="font-bold text-xs">
+                      <TableCell align="center" className="font-bold text-white! text-xs">
                         Loan
                       </TableCell>
-                      <TableCell align="center" className="font-bold text-xs">
+                      <TableCell align="center" className="font-bold text-white! text-xs">
                         Baki Loan
                       </TableCell>
-                      <TableCell align="center" className="font-bold text-xs">
+                      <TableCell align="center" className="font-bold text-white! text-xs">
                         Loan Hapto
                       </TableCell>
-                      <TableCell align="center" className="font-bold text-xs">
+                      <TableCell align="center" className="font-bold text-white! text-xs">
                         Loan Interest
                       </TableCell>
-                      <TableCell align="center" className="font-bold text-xs">
+                      <TableCell align="center" className="font-bold text-white! text-xs">
                         Part Payment
                       </TableCell>
-                      <TableCell align="center" className="font-bold text-xs">
+                      <TableCell align="center" className="font-bold text-white! text-xs">
                         Total
                       </TableCell>
                     </TableRow>

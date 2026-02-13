@@ -14,10 +14,11 @@ const theme = createTheme({
     fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
   },
   palette: {
-    primary: { main: "#374151" },
-    secondary: { main: "#6b7280" },
+    // primary: { main: "#374151" },
+    primary: { main: "#04594A" },
+    secondary: { main: "#BF9227" },
     background: { default: "#ffffff", paper: "#f9fafb" },
-    text: { primary: "#374151", secondary: "#4b5563" },
+    text: { primary: "#04594A", secondary: "#BF9227" },
   },
 });
 

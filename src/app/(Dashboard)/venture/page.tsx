@@ -96,16 +96,17 @@ const Page: React.FC = () => {
   return (
     <div className="min-h-screen text-black sm:p-4 bg-background">
       <div className=" bg-background sm:bg-white w-full rounded-lg p-2 space-y-4 max-w-2xl mx-auto">
-        <h2 className="text-xl font-semibold border-b pb-2 pt-2">
+        <h2 className="text-2xl font-extrabold! font-secondary text-primary  border-b pb-2 pt-2">
           Create New Venture
         </h2>
 
         {/* Name */}
-        <div className="space-y-4">
+        <div className="space-y-4 ">
           <div>
             <Input
               type="text"
               placeholder="Venture Name"
+             
               value={vc.name}
               setValue={(val) => setVc({ ...vc, name: val })}
             />
@@ -141,7 +142,7 @@ const Page: React.FC = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
             <div>
               <label className="text-sm font-medium text-gray-700">
                 Start Date
@@ -181,7 +182,7 @@ const Page: React.FC = () => {
         <div className="pt-4">
           <button
             onClick={submitHandler}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 transition-colors text-white py-3 rounded-lg font-semibold"
+            className="w-full bg-primary hover:bg-primary/80 transition-colors text-white py-3 rounded-lg font-semibold"
           >
             Create Venture
           </button>

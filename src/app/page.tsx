@@ -1,4 +1,367 @@
-import { redirect } from "next/navigation";
-export default function Home() {
-  redirect("/profile");
-}
+"use client";
+import { CircularProgress, Fab } from "@mui/material";
+import Lottie from "lottie-react";
+import Link from "next/link";
+import { useState } from "react";
+import { useViewVentureQuery } from "@/hooks/membership/useViewVenture";
+import ProfileBar from "@/components/ProfileBar";
+
+type Venture = {
+  _id: string;
+  name: string;
+  monthly_emi: number; // Was monthly_contribution
+  interest_rate: number; // Was loan_interest_percent
+  start_date: Date;
+  collection_date: number; // Monthly occurrence date (1-31)
+  max_loan_amount: number; // Was max_loan_percent, now fixed amount
+  loan_repayment_percent: number; // Fixed Monthly Loan Repayment percentage
+  members: string[]; // Array of strings (User IDs)
+  requests: string[]; // Array of strings (Request IDs or User IDs?)
+
+  // System fields kept for compatibility/logic
+  created_at: Date;
+  updated_at: Date;
+  created_by: string;
+  fund_wallet: number;
+  status: string;
+};
+
+const Page = () => {
+  const [popup, setPopup] = useState<boolean>(false);
+  const [scale, setScale] = useState<number>(1000);
+
+  const { data: venture, isLoading, isError, error } = useViewVentureQuery();
+
+  
+
+  if (isLoading) {
+    return (
+      <div className="flex-1 flex justify-center items-center w-full">
+        <CircularProgress />
+      </div>
+    );
+  }
+  if (isError) {
+    return (
+      <div className="flex-1 flex justify-center items-center w-full">
+        <p>{error.message}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full  mx-auto bg-background h-full">
+      {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {ventureData?.map((item: Venture) => (
+          <PlanCard key={item._id} data={item} isAdmin={true} />
+        ))}
+
+      </div> */}
+
+      <ProfileBar />
+      <div className=" max-w-5xl mx-auto py-[20px]">
+        <div className="border-b-[1px] border-gray-200 px-[20px] py-[10px] mb-[20px] flex justify-between items-center">
+          <p className="text-3xl font-secondary font-bold!">
+            My <span className="text-primary">Ventures</span>
+          </p>
+         {venture.length > 0 && (
+          <p className="text-primary bg-primary/10 border-primary border px-[10px] flex items-center h-8 font-bold rounded-full">
+            {venture.length} ventures
+          </p>
+         )}
+        </div>
+        <div className="grid grid-cols-2 gap-3 px-[10px]">
+          {/* Venture */}
+          {venture.map((v: Venture, i: number) => (
+            <Link
+              key={v._id}
+              href={`/view-venture/${v._id}`}
+              onMouseEnter={() => setScale(i)}
+              onMouseLeave={() => setScale(1000)}
+              className="flex flex-col items-center border-[1px] border-gray-200 rounded-2xl overflow-hidden"
+            >
+              <div className="flex gap-2 items-center justify-center w-full py-4 relative  overflow-hidden bg-primary/20">
+                {/* layers */}
+                <div className="absolute w-15 h-15 rounded-full bg-secondary/10 hover:bg-secondary/20 flex items-center justify-center text-white text-sm font-semibold -top-3 -left-3"></div>
+                <div className="absolute w-20 h-20 rounded-full bg-primary/10 hover:bg-secondary/20 flex items-center justify-center text-white text-sm font-semibold -bottom-5 -right-5"></div>
+                <div
+                  className={
+                    scale === i
+                      ? `transition-all duration-500 scale-120`
+                      : `transition-all duration-500 scale-100`
+                  }
+                >
+                  <svg
+                    width="80"
+                    height="80"
+                    viewBox="0 0 80 80"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    {" "}
+                    <rect
+                      x="20"
+                      y="28"
+                      width="40"
+                      height="36"
+                      rx="3"
+                      fill={scale === i ? "#BF9227" : "#04594A"}
+                      opacity=".15"
+                    />{" "}
+                    <rect
+                      x="26"
+                      y="22"
+                      width="28"
+                      height="42"
+                      rx="3"
+                      fill={scale === i ? "#BF9227" : "#04594A"}
+                      opacity=".28"
+                    />{" "}
+                    <rect
+                      x="32"
+                      y="16"
+                      width="16"
+                      height="48"
+                      rx="2"
+                      fill={scale === i ? "#BF9227" : "#04594A"}
+                      opacity=".55"
+                    />{" "}
+                    <rect
+                      x="36"
+                      y="10"
+                      width="8"
+                      height="54"
+                      rx="1.5"
+                      fill={scale === i ? "#BF9227" : "#04594A"}
+                    />{" "}
+                    <rect
+                      x="34"
+                      y="54"
+                      width="12"
+                      height="10"
+                      rx="1"
+                      fill={scale === i ? "#BF9227" : "#04594A"}
+                      opacity=".7"
+                    />
+                    <rect
+                      x="34"
+                      y="20"
+                      width="4"
+                      height="4"
+                      rx="0.8"
+                      fill="white"
+                      opacity=".6"
+                    />
+                    <rect
+                      x="42"
+                      y="20"
+                      width="4"
+                      height="4"
+                      rx="0.8"
+                      fill="white"
+                      opacity=".6"
+                    />
+                    <rect
+                      x="34"
+                      y="30"
+                      width="4"
+                      height="4"
+                      rx="0.8"
+                      fill="white"
+                      opacity=".6"
+                    />
+                    <rect
+                      x="42"
+                      y="30"
+                      width="4"
+                      height="4"
+                      rx="0.8"
+                      fill="white"
+                      opacity=".6"
+                    />
+                    <rect
+                      x="34"
+                      y="40"
+                      width="4"
+                      height="4"
+                      rx="0.8"
+                      fill="white"
+                      opacity=".6"
+                    />
+                    <rect
+                      x="42"
+                      y="40"
+                      width="4"
+                      height="4"
+                      rx="0.8"
+                      fill="white"
+                      opacity=".6"
+                    />
+                    <rect
+                      x="12"
+                      y="50"
+                      width="10"
+                      height="10"
+                      rx="1.5"
+                      fill={scale === i ? "#BF9227" : "#04594A"}
+                      opacity=".22"
+                      transform="rotate(-10 12 50)"
+                    />
+                    <rect
+                      x="58"
+                      y="44"
+                      width="8"
+                      height="8"
+                      rx="1.2"
+                      fill={scale === i ? "#BF9227" : "#04594A"}
+                      opacity=".28"
+                      transform="rotate(12 58 44)"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <div className="py-3">
+                <p className=" uppercase w-full text-secondary text-sm pt-2 font-semibold rounded-2xl text-center">
+                  {v.name}
+                </p>
+                <p className="  w-full text-primary text-xs pb-2 font-semibold rounded-2xl text-center">
+                  Active {v.members.length} Members
+                </p>
+              </div>
+            </Link>
+          ))}
+        </div>
+        {/* For Big Screen */}
+        <div className="hidden sm:grid grid-cols-2  justify-center items-baseline my-[20px] gap-3  ">
+          <Link href="/join">
+            <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-lg ">
+              <span className="font-medium text-gray-700">Join Venture</span>
+              <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                  stroke="currentColor"
+                  className="w-5 h-5"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"
+                  />
+                </svg>
+              </div>
+            </div>
+          </Link>
+          <Link href="/venture">
+            <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-lg">
+              <span className="font-medium text-gray-700">Create Venture</span>
+              <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                  stroke="currentColor"
+                  className="w-5 h-5"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 4.5v15m7.5-7.5h-15"
+                  />
+                </svg>
+              </div>
+            </div>
+          </Link>
+        </div>
+        <div className="sm:hidden">
+          {/* Overlay - visible when popup is true */}
+          {popup && (
+            <div
+              className="fixed inset-0 bg-black/50 z-[999] backdrop-blur-sm transition-all duration-300"
+              onClick={() => setPopup(false)}
+            />
+          )}
+
+          {/* Options */}
+          <div
+            className={`fixed bottom-[90px] right-6 flex flex-col items-end gap-3 z-[1000] transition-all duration-300 ${
+              popup
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-4 pointer-events-none"
+            }`}
+          >
+            <Link href="/join">
+              <div className="flex items-center gap-2 bg-primary px-4 py-2 rounded-full shadow-lg">
+                <span className="font-medium text-white text-xl">
+                  Join Venture
+                </span>
+                <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-secondary/90">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                    stroke="currentColor"
+                    className="w-6 h-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </Link>
+
+            <Link href="/venture">
+              <div className="flex items-center gap-2 bg-primary px-4 py-2 rounded-full shadow-lg">
+                <span className="font-medium text-white text-xl">
+                  Create Venture
+                </span>
+                <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-secondary/90">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                    stroke="currentColor"
+                    className="w-6 h-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 4.5v15m7.5-7.5h-15"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </Link>
+          </div>
+
+          {/* Main FAB */}
+          <Fab
+            color="primary"
+            aria-label="add"
+            sx={{
+              position: "fixed",
+              bottom: 24,
+              right: 24,
+              zIndex: 1000,
+              transform: popup ? "rotate(45deg)" : "rotate(0deg)",
+              transition: "transform 0.3s ease",
+            }}
+            onClick={() => setPopup(!popup)}
+          >
+            <span className="text-3xl font-light">+</span>
+          </Fab>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Page;

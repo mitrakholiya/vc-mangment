@@ -44,7 +44,7 @@ const page = () => {
 
   if (isLoading) {
     return (
-      <div className="flex-1 flex justify-center items-center w-full">
+      <div className="flex-1 flex justify-center items-center w-full h-[50vh]">
         <CircularProgress />
       </div>
     );
@@ -63,7 +63,7 @@ const page = () => {
         <div className="grid grid-cols-2 gap-2 mb-[20px] px-[10px]">
           <button
             onClick={() => setActive(true)}
-            className={`py-1 px-4 text-sm rounded-lg flex items-center gap-2 border transition-colors ${active ? "bg-gray-900/80 text-white border-gray-900" : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"}`}
+            className={`py-3 px-4 text-sm rounded-lg flex items-center gap-2 border transition-colors ${active ? "bg-primary text-white border-primary" : "bg-white text-primary border-primary hover:bg-primary/10"}`}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -84,21 +84,7 @@ const page = () => {
                 d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
               />
             </svg>
-            Venture
-          </button>
-          <button
-            onClick={() => setActive(false)}
-            className={`py-1 px-4 text-sm rounded-lg flex items-center gap-2 border transition-colors ${!active ? "bg-gray-900/80 text-white border-gray-900" : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"}`}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-6 h-6"
-            >
-              <path
+Venture </button> <button onClick={() => setActive(false)} className={`py-1 px-4 text-sm rounded-lg flex items-center gap-2 border transition-colors ${!active ? "bg-primary text-white border-primary" : "bg-white text-primary border-primary hover:bg-primary/10"}`} > <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6" > <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75"
@@ -112,7 +98,7 @@ const page = () => {
       {active && (
         <>
           {/* Desktop Button */}
-          <div className="hidden sm:flex justify-end mb-4 px-[10px]">
+          {/* <div className="hidden sm:flex justify-end mb-4 px-[10px]">
             <Link href={`/view-venture/history/${vc_id}`} passHref>
               <Button
                 variant="outlined"
@@ -138,10 +124,10 @@ const page = () => {
                 History
               </Button>
             </Link>
-          </div>
+          </div> */}
 
           {/* Mobile FAB */}
-          <div className="fixed bottom-20 right-4 z-50 sm:hidden">
+          {/* <div className="fixed bottom-20 right-4 z-50 sm:hidden">
             <Link href={`/view-venture/history/${vc_id}`} passHref>
               <Fab
                 color="primary"
@@ -166,7 +152,7 @@ const page = () => {
                 History
               </Fab>
             </Link>
-          </div>
+          </div> */}
 
           <ViewVentureComponent data={userVcMonthlyData as any} />
         </>

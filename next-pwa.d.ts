@@ -11,5 +11,5 @@ declare module "next-pwa" {
     [key: string]: any;
   }): (nextConfig: NextConfig) => NextConfig;
 
-  export = withPWA;
+  export default withPWA;
 }

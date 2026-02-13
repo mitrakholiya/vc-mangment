@@ -9,8 +9,8 @@ import { CircularProgress } from "@mui/material";
 
 const Login = () => {
   const router = useRouter();
-    const [isLoading,setIsLoading] = useState(false);
-  
+  const [isLoading, setIsLoading] = useState(false);
+
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
 
@@ -19,7 +19,8 @@ const Login = () => {
     const res = await axios.post("/api/login", { email, password: pass });
     if (res?.data?.success) {
       toast.success("Login Compaleted");
-      router.push("/profile");
+      // router.push("/profile");
+      router.push("/");
     } else {
       toast.error("User is Not Found Plase Sing in Frist");
       router.push("/register");
@@ -27,24 +28,27 @@ const Login = () => {
     setIsLoading(false);
   };
 
-    if (isLoading) {
-  return(
-  <div className="h-screen w-full flex justify-center items-center">
-            <CircularProgress />
-  </div>
-)
-}
+  if (isLoading) {
+    return (
+      <div className="h-screen w-full flex justify-center items-center">
+        <CircularProgress />
+      </div>
+    );
+  }
   return (
-    <div className="flex h-[100dvh] sm:items-center items-end justify-center sm:bg-background bg-secondary sm:px-4">
+    <div className="flex h-[100dvh] sm:items-center items-end justify-center sm:bg-background bg-primary sm:px-4">
       <div className="w-full max-w-md rounded-[30px_30px_0_0] sm:rounded-xl bg-white p-8 shadow-lg border border-gray-100 text-gray-900">
         <div className="mb-8 text-center">
-          <h2 className="text-2xl font-bold text-gray-900">Welcome Back</h2>
-          <p className="mt-2 text-sm text-gray-500">
+          <h2 className="text-3xl font-bold text-gray-900 font-secondary">
+            Welcome&nbsp;
+            <span className="text-primary">Back</span>
+          </h2>
+          <p className="mt-2 text-sm text-gray-700">
             Please Login to your account
           </p>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-6 text-primary">
           <div className="mt-1">
             <Input
               type="email"
@@ -65,18 +69,18 @@ const Login = () => {
 
           <div>
             <button
-              className="flex w-full justify-center rounded-md bg-secondary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-colors"
+              className="flex w-full justify-center rounded-md bg-primary px-4 py-3 uppercase  font-semibold text-white shadow-sm transition-transform hover:scale-105 duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary transition-colors"
               onClick={handleSubmit}
             >
               Log In
             </button>
           </div>
 
-          <p className="text-center text-sm">
-            Don’t Have an Account ?
+          <p className="text-center text-sm text-gray-700  ">
+            Don’t Have an Account ?{" "}
             <Link
               href="/register"
-              className="text-blue-400 hover:text-blue-500 hover:underline"
+              className="text-secondary/80 hover:text-secondary underline"
             >
               Register
             </Link>

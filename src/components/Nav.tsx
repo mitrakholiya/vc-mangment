@@ -15,7 +15,7 @@ const Nav = () => {
   return (
     <>
       {/* Mobile Navbar */}
-      <div className="flex items-center gap-3 px-4 py-3 bg-primary/20 text-white">
+      <div className="flex items-center gap-3 px-4 py-3 bg-primary text-white">
         <button
           onClick={() => setIsOpen(true)}
           className="text-2xl"

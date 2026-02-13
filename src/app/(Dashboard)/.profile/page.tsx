@@ -60,13 +60,30 @@ const Page = () => {
             <Link
               key={v._id}
               href={`/view-venture/${v._id}`}
-              className="flex flex-col items-center bg-black/10 border-[1px] border-gray-900/60 rounded-2xl"
-            >
-              <Lottie
-                animationData={animationData}
-                loop={true}
-                className="w-50 h-30"
-              />
+              className="flex flex-col items-center border-[1px] border-gray-900/60 rounded-2xl overflow-hidden" >
+
+              <div className="flex gap-2 items-center justify-center w-full py-4">
+                <div className="relative">
+                <div className="absolute w-12 h-12 rounded-full bg-primary/80 flex items-center justify-center text-white text-sm font-semibold -top-2 -left-12">
+                </div>
+            
+                </div>
+                <svg width="72" height="72" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg"> <rect x="20" y="28" width="40" height="36" rx="3" fill="#04594A" opacity=".15" /> <rect x="26" y="22" width="28" height="42" rx="3" fill="#04594A" opacity=".28" /> <rect x="32" y="16" width="16" height="48" rx="2" fill="#04594A" opacity=".55" /> <rect x="36" y="10" width="8" height="54" rx="1.5" fill="#04594A" /> <rect x="34" y="54" width="12" height="10" rx="1" fill="#04594A" opacity=".7" />
+                  <rect x="34" y="20" width="4" height="4" rx="0.8" fill="white" opacity=".6" />
+                  <rect x="42" y="20" width="4" height="4" rx="0.8" fill="white" opacity=".6" />
+                  <rect x="34" y="30" width="4" height="4" rx="0.8" fill="white" opacity=".6" />
+                  <rect x="42" y="30" width="4" height="4" rx="0.8" fill="white" opacity=".6" />
+                  <rect x="34" y="40" width="4" height="4" rx="0.8" fill="white" opacity=".6" />
+                  <rect x="42" y="40" width="4" height="4" rx="0.8" fill="white" opacity=".6" />
+                  <rect x="12" y="50" width="10" height="10" rx="1.5" fill="#04594A" opacity=".22" transform="rotate(-10 12 50)" />
+                  <rect x="58" y="44" width="8" height="8" rx="1.2" fill="#04594A" opacity=".28" transform="rotate(12 58 44)" />
+                </svg>
+                <div className="relative">
+
+                </div>
+              </div>
+
+
               <p className=" uppercase  w-full text-secondary text-[19px] pb-2 font-semibold rounded-2xl text-center">
                 {v.name}
               </p>
@@ -129,11 +146,10 @@ const Page = () => {
 
           {/* Options */}
           <div
-            className={`fixed bottom-[90px] right-6 flex flex-col items-end gap-3 z-[1000] transition-all duration-300 ${
-              popup
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-4 pointer-events-none"
-            }`}
+            className={`fixed bottom-[90px] right-6 flex flex-col items-end gap-3 z-[1000] transition-all duration-300 ${popup
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 translate-y-4 pointer-events-none"
+              }`}
           >
             <Link href="/join">
               <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-lg">

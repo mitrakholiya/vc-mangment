@@ -6,7 +6,7 @@ export function middleware(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
 
   const publicPaths = ["/login", "/register"];
-  const privatePaths = ["/profile", "/venture", "/join"];
+  const privatePaths = ["/", "/venture", "/join"];
 
   const isPublicPath = publicPaths.includes(path);
 
@@ -17,7 +17,7 @@ export function middleware(request: NextRequest) {
 
   // Auth user trying to access public pages
   if (isPublicPath && token) {
-    return NextResponse.redirect(new URL("/profile", request.url));
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
   // Unauth user trying to access protected pages

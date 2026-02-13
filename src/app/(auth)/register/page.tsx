@@ -57,10 +57,12 @@ return(<>
   } 
   
   return (
-    <div className="flex h-[100dvh] sm:items-center items-end justify-center sm:bg-background bg-secondary sm:px-4">
+    <div className="flex h-[100dvh] sm:items-center items-end justify-center sm:bg-background bg-primary sm:px-4">
       <div className="w-full max-w-md rounded-[30px_30px_0_0] sm:rounded-xl bg-white p-8 shadow-lg border border-gray-100 text-gray-900">
         <div className="mb-8 text-center">
-          <h2 className="text-2xl font-bold text-gray-900">Create Account</h2>
+          <h2 className="text-3xl font-bold text-gray-900 font-secondary ">Create
+            
+            <span className="text-primary"> Account</span></h2>
           <p className="mt-2 text-sm text-gray-500">
             Please register to create your account
           </p>
@@ -112,7 +114,7 @@ return(<>
           <div>
             <button
               onClick={handleSubmit}
-              className="flex w-full justify-center rounded-md bg-secondary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-colors"
+              className="flex w-full justify-center rounded-md bg-primary px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-colors"
             >
               Sign Up
             </button>
@@ -122,7 +124,7 @@ return(<>
             Already Have an Account ?
             <Link
               href="/login"
-              className="text-blue-400 hover:text-blue-500 hover:underline"
+              className="text-secondary hover:text-secondary/80 hover:underline"
             >
               {" "}
               Login

@@ -50,7 +50,7 @@ const Page = () => {
   }
 
   return (
-    <div className="w-full  mx-auto bg-background h-full">
+    <div className="w-full  mx-auto bg-background h-full overflow-hidden">
       {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {ventureData?.map((item: Venture) => (
           <PlanCard key={item._id} data={item} isAdmin={true} />

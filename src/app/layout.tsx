@@ -35,7 +35,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.className} flex flex-col min-h-dvh`}>
         <Providers>
-          <main className="flex-1 flex flex-col w-full">{children}</main>
+          <main className="flex-1 flex flex-col w-full ">{children}</main>
         </Providers>
       </body>
     </html>

@@ -33,31 +33,9 @@ export const GET = async () => {
       "members.user_id": decoded.userId,
     }).populate({
       path: "requests",
-      model: "User", // Explicitly specify the model name
+      model: "User",
       select: "name email phone",
     });
-
-    // if (!membership.length) {
-    //     return NextResponse.json(
-    //         { success: false, message: "No VC Found" },
-    //         { status: 404 }
-    //     );
-    // }
-
-    // extract VC ids (IMPORTANT: vc_id, not user_id)
-    // const vcIds = membership.map((member) => member.vc_id);
-
-    // fetch all ventures in ONE query
-    // const data = await VentureModel.find({
-    //     _id: { $in: vcIds },
-    // });
-
-    // if (!data.length) {
-    //     return NextResponse.json(
-    //         { success: false, message: "No VC Found" },
-    //         { status: 404 }
-    //     );
-    // }
 
     return NextResponse.json({
       success: true,

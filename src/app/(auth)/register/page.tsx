@@ -59,14 +59,14 @@ const Page = () => {
   }
 
   return (
-    <div className="flex h-[100dvh]  flex-col sm:flex-row items-center sm:justify-evenly justify-end bg-transparent sm:px-4 relative">
-      <div className="sm:relative absolute inset-0  z-[-1] sm:top-0 top-[20px]  ">
+    <div className="flex h-[100dvh]  flex-col  items-center sm:justify-evenly justify-end bg-transparent sm:px-4 relative">
+      <div className="sm:relative absolute inset-0  z-[-1] sm:top-0 top-[80px]  ">
         <div className="flex w-full justify-center">
           <Image
             src="/icons/syncera.png"
             alt="Syncera logo"
-            width={400}
-            height={400}
+            width={200}
+            height={200}
             className="object-contain"
             priority
           />

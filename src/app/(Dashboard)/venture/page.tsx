@@ -66,7 +66,7 @@ const Page: React.FC = () => {
 
     if (response?.success) {
       toast.success("Venture Created Successfully");
-      console.log(response.data);
+
 
       // const res = await createMembership({
       //   vc_id: response.data._id,

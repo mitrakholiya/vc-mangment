@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
 
 import {
@@ -36,6 +36,7 @@ import {
 import NextMonthData from "./NextMonthData";
 import { Share2, Download } from "lucide-react";
 import { shareMonthlyPdf } from "@/lib/shareMonthlyData";
+import Loading from "../Loading";
 
 interface VcUserMonthly {
   _id: string;
@@ -111,13 +112,53 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
   const last_month_remaining_amount =
     currentVcMonthly?.last_month_remaining_amount || 0;
 
-  const RemainingAmount = currentVcMonthly?.remaining_amount || 0;
+  // Robust calculation of remaining amount based on current data
+  const { totalMonthlyCont, totalLoanRepay, totalLoanVyaj, totalPartPay } =
+    React.useMemo(() => {
+      return {
+        totalMonthlyCont: userVcMonthlyData.reduce(
+          (s, r) => s + (r.monthly_contribution || 0),
+          0,
+        ),
+        totalLoanRepay: userVcMonthlyData.reduce(
+          (s, r) => s + (r.loan_monthly_emi || 0),
+          0,
+        ),
+        totalLoanVyaj: userVcMonthlyData.reduce(
+          (s, r) => s + (r.loan_interest || 0),
+          0,
+        ),
+        totalPartPay: userVcMonthlyData.reduce(
+          (s, r) => s + (r.part_payment || 0),
+          0,
+        ),
+      };
+    }, [userVcMonthlyData]);
 
-  const withOuntLastMonthRema =
-    currentVcMonthly?.total - last_month_remaining_amount;
+  const currentTotalFunds =
+    last_month_remaining_amount +
+    totalMonthlyCont +
+    totalLoanRepay +
+    totalLoanVyaj +
+    totalPartPay;
+
+  const totalLoansGiven =
+    currentVcMonthly?.loans?.reduce(
+      (s: any, l: any) => s + (l.loan_amount || 0),
+      0,
+    ) || 0;
+  const totalExitingPaid =
+    currentVcMonthly?.exiting_members?.reduce(
+      (s: any, m: any) => s + (m.total_paid || 0),
+      0,
+    ) || 0;
+
+  const RemainingAmount =
+    currentTotalFunds - totalLoansGiven - totalExitingPaid;
+
+  const withOuntLastMonthRema = currentTotalFunds - last_month_remaining_amount;
+
   // Local State for Dialogs
-
-  // Done State
   const [done, setDone] = React.useState(vcMonthlyData?.[0]?.lock || false);
 
   React.useEffect(() => {
@@ -126,6 +167,7 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
     }
   }, [vcMonthlyData]);
 
+  const [loading, setLoading] = React.useState(false);
   const [isLoanModalOpen, setIsLoanModalOpen] = React.useState(false);
   const [selectedUserForLoan, setSelectedUserForLoan] = React.useState<
     any | null
@@ -166,6 +208,7 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
       );
       return;
     }
+    setLoading(true);
 
     const manualLoanMap = { [selectedUserForLoan._id]: loanAmountInput };
     const res = await onAddLoan({ loan: manualLoanMap });
@@ -177,6 +220,7 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
       toast.error(res?.message || "Something Went Wrong");
       refetch();
     }
+    setLoading(false);
   };
 
   let compalated = userVcMonthlyData?.every(
@@ -198,12 +242,7 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
   const isPartPaymentInvalid =
     !!partPaymentInput && Number(partPaymentInput) > maxPartPayment;
 
-  if (isLoading)
-    return (
-      <div className="flex justify-center items-center h-48">
-        <CircularProgress />
-      </div>
-    );
+  if (isLoading) return <Loading />;
   if (isError)
     return (
       <div className="text-center text-gray-700 font-bold py-4">
@@ -298,7 +337,7 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
 
     // Call mutation with object
     const res = await onApprove(approveSelectedId, partPayment);
-
+    setLoading(true);
     if (res?.success === true) {
       toast.success("Approved successfully");
       refetch();
@@ -307,11 +346,13 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
       toast.error(res?.message || "Something Went Wrong");
       handleCloseApproveDialog();
     }
+    setLoading(false);
   };
 
   // Direct approvel
 
   const handleDirectApprovel = async (id: string) => {
+    setLoading(true);
     // Call mutation with object
     const res = await onApprove(id, 0);
 
@@ -321,6 +362,7 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
     } else {
       toast.error(res?.message || "Something Went Wrong");
     }
+    setLoading(false);
   };
 
   // Handel Lock this month
@@ -332,6 +374,7 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
       "Are you sure you want to finalize this month? This action cannot be undone.",
     );
     if (!confirmed) return;
+    setLoading(true);
 
     const res = await onLock(vcMonthlyData[0]?._id);
     if (res?.success === true) {
@@ -340,6 +383,7 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
     } else {
       toast.error(res?.message || "Something Went Wrong");
     }
+    setLoading(false);
   };
 
   // Calculate totals at component level to pass to share function (duplication of logic inside render, cleaner to lift up)
@@ -394,13 +438,28 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
     );
   };
 
+  if (loading) {
+    return <Loading />;
+  }
+
   return (
     <div className="mt-4">
       <div className="flex justify-between items-center px-2 mb-2 border-b border-gray-100 pb-2 ">
-        <h4 className="text-xl font-secondary! font-bold text-secondary tracking-widest uppercase">
-          Member Table
-        </h4>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4">
+          <h4 className="text-xl font-secondary! font-bold text-secondary tracking-widest uppercase">
+            Member Table
+          </h4>
+          {/* <div className="flex items-center gap-1.5 bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
+            <span className="text-[10px] font-bold text-primary uppercase tracking-tight">
+              Venture Balance:
+            </span>
+            <span className="text-sm font-extrabold text-primary">
+              ₹{RemainingAmount.toLocaleString()}
+            </span>
+          </div> */}
+        </div>
         {/* <div className="h-px bg-primary flex-1 mx-3"></div> */}
+
         <div className="flex items-center gap-3">
           {/* <Typography className="text-sm font-extrabold text-gray-500 uppercase tracking-tighter">
             {monthName} {year}
@@ -748,19 +807,17 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
             {/* Total Row */}
 
             <TableRow className="bg-primary/20 border-t border-b border-1 border-primary">
-              
               <TableCell></TableCell>
-               
-           
+
               <TableCell
                 align="center"
                 className="text-primary font-bold text-lg "
-                 sx={{
+                sx={{
                   position: "sticky",
                   left: 0,
                   backgroundColor: "#04594A",
                   color: "white",
-                 }}
+                }}
               >
                 Total
               </TableCell>

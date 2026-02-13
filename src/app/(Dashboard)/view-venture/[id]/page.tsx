@@ -31,16 +31,12 @@ const page = () => {
     error: userVcMonthlyError,
   } = useUserVcMonthlyById(vc_id);
 
-  if (!isLoading) {
-    console.log(userVcMonthlyData);
-    console.log(data);
-  }
+
 
   const filteredData = data?.filter((item: any) => item._id === vc_id);
 
   const isAdmin: boolean = (userVcMonthlyData as any)?.isAdmin;
 
-  console.log(isAdmin);
 
   if (isLoading) {
     return (

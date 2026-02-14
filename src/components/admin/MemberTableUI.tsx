@@ -1437,6 +1437,9 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
                           {matchingVcMonthly.loans?.length > 0 ||
                           matchingVcMonthly.exiting_members?.length > 0 ? (
                             <>
+                              <p className="text-sm font-semibold text-secondary uppercase tracking-wider border-b  border-gray-200">
+                                New Loans:
+                              </p>
                               {matchingVcMonthly.loans?.map(
                                 (loan: any, idx: number) => {
                                   const userName =
@@ -1449,17 +1452,24 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
                                       className="flex justify-between text-sm"
                                     >
                                       <span
-                                        className="text-gray-600 truncate max-w-[120px]"
+                                        className="text-gray-600 truncate max-w-[250px]"
                                         title={userName}
                                       >
-                                        Loan: {userName}
+                                        <span className="font-semibold text-gray-700 bold">
+                                          {userName}
+                                        </span>
                                       </span>
-                                      <span className="font-semibold text-orange-600">
+                                      <span className="font-semibold text-secondary">
                                         -₹{loan.loan_amount?.toLocaleString()}
                                       </span>
                                     </div>
                                   );
                                 },
+                              )}
+                              {matchingVcMonthly.exiting_members.length > 0 && (
+                                <p className="text-sm font-semibold text-secondary uppercase tracking-wider border-b border-gray-200">
+                                Exited Members:
+                              </p>
                               )}
                               {matchingVcMonthly.exiting_members?.map(
                                 (v: any, idx: number) => {
@@ -1473,10 +1483,10 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
                                       className="flex justify-between text-sm"
                                     >
                                       <span
-                                        className="text-gray-600 truncate max-w-[120px]"
+                                        className="text-gray-600 truncate max-w-[250px]"
                                         title={userName}
                                       >
-                                        Exit: {userName}
+                                       {userName}
                                       </span>
                                       <span className="font-semibold text-orange-600">
                                         -₹{v.total_paid?.toLocaleString()}

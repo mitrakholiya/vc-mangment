@@ -9,9 +9,11 @@ import { CircularProgress } from "@mui/material";
 
 import Image from "next/image";
 import LoginBackground from "@/components/LoginBackground";
+import { useQueryClient } from "@tanstack/react-query";
 
 const Page = () => {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false);
 
   const [form, setForm] = useState({
@@ -41,6 +43,9 @@ const Page = () => {
       });
       setIsLoading(false);
       if (res?.data.success) {
+        // ⚡ Clear any cached data from previous sessions
+        queryClient.clear();
+
         toast.success("Registration completed");
         router.push("/login");
       }

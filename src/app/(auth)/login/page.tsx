@@ -7,10 +7,11 @@ import toast from "react-hot-toast";
 import { Input } from "@/components/Input";
 import { CircularProgress } from "@mui/material";
 import Image from "next/image";
-import LoginBackground from "@/components/LoginBackground";
+import { useQueryClient } from "@tanstack/react-query";
 
 const Login = () => {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false);
 
   const [email, setEmail] = useState("");
@@ -27,6 +28,9 @@ const Login = () => {
       });
 
       if (res?.data?.success) {
+        // ⚡ Clear old user's cached data
+        queryClient.clear();
+
         toast.success("Login Completed");
         router.push("/");
       } else {

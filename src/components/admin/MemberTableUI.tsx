@@ -876,7 +876,7 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
             ))}
             {/* Total Row */}
 
-            <TableRow className="bg-primary/20 border-t border-b border-1 border-primary">
+            <TableRow className="bg-primary/20 border-t border-b border-[1px] border-primary">
               <TableCell></TableCell>
 
               <TableCell

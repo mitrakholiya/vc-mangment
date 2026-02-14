@@ -38,7 +38,7 @@ export async function PUT(req: Request) {
 
     await dbConnect();
 
-    // 1. Find the Contribution Record
+    // 1. Find the Contribution Record first
     const contribution = await VcUserMonthlyModel.findById(id);
 
     if (!contribution) {
@@ -48,9 +48,8 @@ export async function PUT(req: Request) {
       );
     }
 
-    // check If Exitwe member's part payment re add by misteck 
-
-       const venture = await VentureModel.findById(contribution.vc_id);
+    // 2. Then fetch venture
+    const venture = await VentureModel.findById(contribution.vc_id);
 
     if (!venture) {
       return NextResponse.json(
@@ -59,21 +58,19 @@ export async function PUT(req: Request) {
       );
     }
 
+    //   const userid = contribution.user_id;
 
-  //   const userid = contribution.user_id;
+    //   const isMember = venture.members.find((member: any) => member.user_id.toString() === userid.toString());
 
-
-  //   const isMember = venture.members.find((member: any) => member.user_id.toString() === userid.toString());
-
-  //  if(!isMember){
-  //   return NextResponse.json(
-  //     { success: false, message: "Member is no longer a member of this venture" },
-  //     { status: 200 },
-  //   );
-  //  }
+    //  if(!isMember){
+    //   return NextResponse.json(
+    //     { success: false, message: "Member is no longer a member of this venture" },
+    //     { status: 200 },
+    //   );
+    //  }
 
     // 2. Verify that the Requestor is the Admin of the Venture
- 
+
     if (String(venture.created_by) !== String(decoded.userId)) {
       return NextResponse.json(
         {

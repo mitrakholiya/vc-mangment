@@ -51,17 +51,9 @@ const Page = () => {
     // setIsLoading(false);
   };
 
-  if (isLoading) {
-    return (
-      <div className="h-screen w-full flex justify-center items-center">
-        <CircularProgress />
-      </div>
-    );
-  }
-
   return (
     <div className="flex h-[100dvh]  flex-col  items-center sm:justify-evenly justify-center bg-transparent sm:px-4 relative">
-      <div className="sm:relative absolute inset-0  z-[1] sm:top-0 top-[80px]  ">
+      <div className="">
         <div className="flex w-full justify-center">
           <Image
             src="/icons/syncera.png"
@@ -73,10 +65,10 @@ const Page = () => {
           />
         </div>
       </div>
-      {/* <div className="absolute inset-0 bg-background z-[-2]"></div> */}
-      <LoginBackground />
+      <div className="absolute inset-0 bg-[#F9F7F2] z-[-2]"></div>
+      {/* <LoginBackground /> */}
 
-      <div className="w-[90%] sm:w-1/2 max-w-md rounded-xl backdrop-blur-md bg-white p-8 shadow-lg border border-gray-100 text-gray-900 mt-[200px] sm:mt-[0px] relative z-[10]">
+      <div className="w-[90%] sm:w-1/2 max-w-md rounded-xl backdrop-blur-md bg-white p-8 shadow-lg border border-gray-100 text-gray-900 mt-[20px] sm:mt-[0px] relative z-[10]">
         <div className="mb-8 text-center">
           <h2 className="text-3xl font-bold! text-gray-900 font-secondary">
             Create
@@ -92,7 +84,7 @@ const Page = () => {
             <div className="mt-1">
               <Input
                 type="text"
-                placeholder="Your Name"
+                placeholder="Name"
                 value={name}
                 setValue={(val) => setForm({ ...form, name: val })}
               />
@@ -103,7 +95,7 @@ const Page = () => {
             <div className="mt-1">
               <Input
                 type="email"
-                placeholder="you@example.com"
+                placeholder="Enter Email"
                 value={email}
                 setValue={(val) => setForm({ ...form, email: val })}
               />
@@ -113,7 +105,7 @@ const Page = () => {
             <div className="mt-1">
               <Input
                 type="text"
-                placeholder="Your Phone Number"
+                placeholder="Phone Number"
                 value={phone}
                 setValue={(val) => setForm({ ...form, phone: val })}
               />
@@ -123,7 +115,7 @@ const Page = () => {
             <div className="mt-1">
               <Input
                 type="password"
-                placeholder="Enter Your Password"
+                placeholder="Password"
                 value={password}
                 setValue={(val) => setForm({ ...form, password: val })}
               />
@@ -133,9 +125,11 @@ const Page = () => {
           <div>
             <button
               onClick={handleSubmit}
-              className="flex w-full justify-center rounded-md bg-primary px-4 py-3 uppercase font-semibold text-white shadow-sm transition-all hover:scale-105 duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary"
+              disabled={isLoading}
+              className="flex w-full justify-center items-center gap-2 rounded-md bg-primary px-4 py-3 uppercase font-semibold text-white shadow-sm transition-all hover:scale-105 duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
-              Sign Up
+              {isLoading && <CircularProgress size={16} color="inherit" />}
+              {isLoading ? "Creating Account..." : "Sign Up"}
             </button>
           </div>
 

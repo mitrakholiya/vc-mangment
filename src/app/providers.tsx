@@ -7,7 +7,19 @@ import React from "react";
 import { Toaster } from "react-hot-toast";
 import ProfileBar from "@/components/ProfileBar";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes - data stays fresh, no loading shown
+      refetchOnWindowFocus: true, // Update in background when user returns
+      refetchOnMount: false, // Don't refetch if data is still fresh
+      retry: 1, // Only retry once to fail fast
+      retryDelay: 1000,
+      // CRITICAL: Keep showing old data while fetching new data
+      placeholderData: (previousData: any) => previousData,
+    },
+  },
+});
 
 const theme = createTheme({
   typography: {

@@ -99,7 +99,7 @@ export async function GET(req: Request) {
       process.env.JWT_SECRET!,
     ) as CustomJwtPayload;
     await dbConnect();
-    const vc = await VentureModel.find({ created_by: decode.userId });
+    const vc = await VentureModel.find({ created_by: decode.userId }).lean();
     // .populate(
     //   "requests",
     //   "name email",

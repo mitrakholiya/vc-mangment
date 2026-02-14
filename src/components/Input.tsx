@@ -35,7 +35,7 @@ export const Input = ({
         },
       }}
       sx={{
-        "& .MuiInputLabel-root": { color: "teal" },
+        "& .MuiInputLabel-root": { color: "black" },
         "& .MuiInputBase-input::placeholder": { color: "teal", opacity: 1 },
       }}
     />

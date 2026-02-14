@@ -72,18 +72,19 @@ export async function PUT(req: Request) {
     const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1;
     const nextYear = currentMonth === 12 ? currentYear + 1 : currentYear;
 
-    let currentVcMonthly = await VcMonthlyModel.findOne({
-      vc_id: venture._id,
-      month: currentMonth,
-      year: currentYear,
-    });
-
-    // Create Next VcMonthly (if not exists)
-    let nextVcMonthly = await VcMonthlyModel.findOne({
-      vc_id: venture._id,
-      month: nextMonth,
-      year: nextYear,
-    });
+    // Fetch current and next month data in parallel (faster!)
+    let [currentVcMonthly, nextVcMonthly] = await Promise.all([
+      VcMonthlyModel.findOne({
+        vc_id: venture._id,
+        month: currentMonth,
+        year: currentYear,
+      }),
+      VcMonthlyModel.findOne({
+        vc_id: venture._id,
+        month: nextMonth,
+        year: nextYear,
+      }),
+    ]);
 
     if (!nextVcMonthly) {
       nextVcMonthly = await VcMonthlyModel.create({

@@ -1,23 +1,23 @@
-"use client";
-
+"use client"; // must be first
 import Link from "next/link";
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation"; // correct import
 import axios from "axios";
 import toast from "react-hot-toast";
 import { Input } from "@/components/Input";
+import { CircularProgress } from "@mui/material";
 import Image from "next/image";
-import Loading from "@/components/Loading";
 import LoginBackground from "@/components/LoginBackground";
 
 const Login = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault(); // stop page reload
     setIsLoading(true);
 
     try {
@@ -33,71 +33,75 @@ const Login = () => {
         toast.error("User not found. Please sign up first.");
         router.push("/register");
       }
-    } catch {
+    } catch (error) {
       toast.error("Something went wrong");
     } finally {
       setIsLoading(false);
     }
   };
 
-  if (isLoading) return <Loading />;
-
   return (
-    <div className="relative min-h-screen flex flex-col items-center justify-center px-4 overflow-hidden">
-      {/* Background */}
-      <LoginBackground />
-
-      {/* Logo */}
-      <div className="relative z-20 mb-6 sm:mb-10">
-        <Image
-          src="/icons/syncera.png"
-          alt="Syncera logo"
-          width={180}
-          height={180}
-          className="object-contain mx-auto w-[140px] sm:w-[180px]"
-          priority
-        />
+    <div className="flex h-[100dvh]  flex-col  items-center sm:justify-evenly justify-center bg-transparent sm:px-4 relative">
+      <div className="  ">
+        <div className="flex w-full justify-center">
+          <Image
+            src="/icons/syncera.png"
+            alt="Syncera logo"
+            width={200}
+            height={200}
+            className="object-contain"
+            priority
+          />
+        </div>
       </div>
+      {/* <LoginBackground /> */}
+      <div className="absolute inset-0 bg-background z-[-2]"></div>
 
-      {/* Login Card */}
-      <div className="relative z-20 w-full max-w-md rounded-2xl bg-white/95 backdrop-blur-md p-6 sm:p-8 shadow-2xl border border-white/20">
-        <div className="mb-6 text-center">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 font-secondary">
-            Welcome <span className="text-primary">Back</span>
+      <div className="w-[90%] sm:w-1/2 max-w-md rounded-2xl bg-white p-8 shadow-2xl border border-white/20 text-gray-900 sm:mt-0 mt-[20px] relative z-[10]">
+        <div className="mb-8 text-center">
+          <h2 className="text-3xl font-bold! text-gray-900 font-secondary">
+            Welcome&nbsp;
+            <span className="text-primary">Back</span>
           </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Please login to your account
+          <p className="mt-2 text-sm text-gray-700">
+            Please Login to your account
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <Input
-            type="email"
-            placeholder="Enter Your Email"
-            value={email}
-            setValue={setEmail}
-          />
+        <form onSubmit={handleSubmit} className="space-y-6 text-primary">
+          <div className="mt-1">
+            <Input
+              type="email"
+              placeholder="Email"
+              value={email}
+              setValue={setEmail}
+            />
+          </div>
 
-          <Input
-            type="password"
-            placeholder="Enter Your Password"
-            value={pass}
-            setValue={setPass}
-          />
+          <div>
+            <Input
+              type="password"
+              placeholder="Password"
+              value={pass}
+              setValue={setPass}
+            />
+          </div>
 
           <button
             type="submit"
-            className="w-full rounded-md bg-primary py-3 font-semibold uppercase text-white shadow-md transition hover:scale-[1.02]"
+            disabled={isLoading}
+            className="flex w-full justify-center items-center gap-2 rounded-md bg-primary px-4 py-3 uppercase font-semibold text-white shadow-sm transition-all hover:scale-105 duration-300 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
-            Log In
+            {isLoading && <CircularProgress size={16} color="inherit" />}
+            {isLoading ? "Logging in..." : "Log In"}
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-gray-600">
-          Don’t have an account?{" "}
+        <p className="text-center text-sm text-gray-700 pt-[20px]  ">
+          Don’t Have an Account ?{" "}
           <Link
             href="/register"
-            className="text-secondary underline hover:text-secondary/80"
+            className="text-secondary/80 hover:text-secondary underline"
           >
             Register
           </Link>

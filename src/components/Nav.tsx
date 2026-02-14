@@ -1,8 +1,10 @@
 "use client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
 const Nav = () => {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   // const getToken = () => {
   //     const token = localStorage.getItem("token");
@@ -73,6 +75,7 @@ const Nav = () => {
                   key={item.href}
                   href={item.href}
                   onClick={() => setIsOpen(false)}
+                  onMouseEnter={() => router.prefetch(item.href)} // Prefetch on hover!
                   className="text-gray-700 hover:text-primary"
                 >
                   {item.label}

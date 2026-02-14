@@ -129,7 +129,7 @@ export async function GET(req: Request) {
       );
     }
 
-    if (venture.created_by !== decoded.userId) {
+    if (venture.created_by.toString() !== decoded.userId.toString()) {
       return NextResponse.json(
         {
           success: false,

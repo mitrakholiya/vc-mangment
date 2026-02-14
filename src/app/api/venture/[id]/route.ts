@@ -74,7 +74,7 @@ export async function PUT(
         message: "VC Not Found",
       });
     }
-    if (vc.created_by !== decode.userId) {
+    if (vc.created_by.toString() !== decode.userId.toString()) {
       return NextResponse.json({
         success: false,
         message: "You are not authorized to update this VC",

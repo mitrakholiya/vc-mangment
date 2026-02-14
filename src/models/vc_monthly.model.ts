@@ -15,7 +15,7 @@ export interface IVcMonthlyExiting {
 }
 
 export interface IVcMonthly extends Document {
-  vc_id: { type: Schema.Types.ObjectId; ref: "Venture"; required: true };
+  vc_id: mongoose.Types.ObjectId | string;
   last_month_remaining_amount: number;
   total_monthly_contribution: number;
   total_loan_repayment: number;

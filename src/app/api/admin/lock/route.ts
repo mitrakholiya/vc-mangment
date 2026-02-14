@@ -72,7 +72,6 @@ export async function PUT(req: Request) {
     const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1;
     const nextYear = currentMonth === 12 ? currentYear + 1 : currentYear;
 
-
     let currentVcMonthly = await VcMonthlyModel.findOne({
       vc_id: venture._id,
       month: currentMonth,
@@ -111,17 +110,18 @@ export async function PUT(req: Request) {
         year: currentYear,
       });
 
-
       // If user take loan in current month
 
-     let totalLoanAmount = currentRecord ? currentRecord.loan_amount : 0;
+      let totalLoanAmount = currentRecord ? currentRecord.loan_amount : 0;
 
-     console.log("totalLoanAmount", totalLoanAmount);
+      console.log("totalLoanAmount", totalLoanAmount);
       // it add in total loan amount
-      let loan = currentVcMonthly.loans.find((loan:{user_id:string, amount:number}) => loan.user_id === member.user_id);
+      let loan = currentVcMonthly?.loans.find(
+        (loan: { user_id: any; loan_amount: number }) =>
+          loan.user_id.toString() === member.user_id.toString(),
+      );
 
-      
-      totalLoanAmount += loan ? loan.amount : 0;
+      totalLoanAmount += loan ? loan.loan_amount : 0;
 
       console.log("After New Loan Added", totalLoanAmount);
 

@@ -50,7 +50,7 @@ export async function PUT(
       );
     }
 
-    if (venture.created_by !== decoded.userId) {
+    if (venture.created_by.toString() !== decoded.userId.toString()) {
       return NextResponse.json(
         {
           success: false,

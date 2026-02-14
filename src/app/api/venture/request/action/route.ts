@@ -48,7 +48,7 @@ export async function POST(req: Request) {
       );
     }
 
-    if (venture.created_by !== decoded.userId) {
+    if (venture.created_by.toString() !== decoded.userId.toString()) {
       // Alternatively check VcMembership for ADMIN role
       return NextResponse.json(
         { success: false, message: "Unauthorized to manage this venture" },

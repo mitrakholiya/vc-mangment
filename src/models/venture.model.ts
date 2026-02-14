@@ -23,7 +23,7 @@ export interface IVenture extends Document {
   max_loan_amount: number; // Was max_loan_percent, now fixed amount
   loan_repayment_percent: number; // Fixed Monthly Loan Repayment percentage
   members: {
-    user_id: Schema.Types.ObjectId;
+    user_id: mongoose.Types.ObjectId;
     role: "ADMIN" | "MEMBER";
   }[]; // Array of objects with user_id and role
   requests?: string[]; // Array of strings (Request IDs or User IDs?)
@@ -31,7 +31,7 @@ export interface IVenture extends Document {
   // System fields kept for compatibility/logic
   created_at?: Date;
   updated_at?: Date;
-  created_by: Schema.Types.ObjectId;
+  created_by: mongoose.Types.ObjectId;
   fund_wallet: number;
   status: string;
 

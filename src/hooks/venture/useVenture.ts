@@ -1,5 +1,5 @@
 import api from "@/lib/axios";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const getVenture = async () => {
   const res = await api.get("/venture");
@@ -25,8 +25,15 @@ export const updateVentureStatus = async (data: {
 };
 
 export const useUpdateVentureStatus = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: updateVentureStatus,
+    onSuccess: () => {
+      // ⚡ Auto-refetch after status update
+      queryClient.invalidateQueries({ queryKey: ["venture-by-id"] });
+      queryClient.invalidateQueries({ queryKey: ["ventures"] });
+    },
   });
 };
 
@@ -40,11 +47,18 @@ export const manageVentureRequest = async (data: {
 };
 
 export const useManageVentureRequest = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: manageVentureRequest,
+    onSuccess: () => {
+      // ⚡ Auto-refetch after accepting/rejecting request
+      queryClient.invalidateQueries({ queryKey: ["venture-by-id"] });
+      queryClient.invalidateQueries({ queryKey: ["ventures"] });
+      queryClient.invalidateQueries({ queryKey: ["members"] });
+    },
   });
 };
-
 
 // ------------------------------------------------------------------------------
 // Exite member repayment
@@ -60,13 +74,23 @@ export const repayExitingDues = async (data: {
 };
 
 export const useRepayExitingDues = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: repayExitingDues,
+    onSuccess: () => {
+      // ⚡ Auto-refetch after repaying exiting dues
+      queryClient.invalidateQueries({ queryKey: ["exiting-dues"] });
+      queryClient.invalidateQueries({ queryKey: ["venture-by-id"] });
+      queryClient.invalidateQueries({ queryKey: ["get-vc-history"] });
+    },
   });
 };
 
 export const getExitingDues = async (vc_id: string) => {
-  const res = await api.get(`/venture/repay-exiting-dues`,{params:{vc_id}});
+  const res = await api.get(`/venture/repay-exiting-dues`, {
+    params: { vc_id },
+  });
   return res.data.data;
 };
 

@@ -1,5 +1,5 @@
 import api from "@/lib/axios";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 // Types
 export interface ContributionData {
@@ -55,17 +55,25 @@ const putDirectApprove = async ({
 };
 
 export const usePutDirectApprove = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: (data: { id: string; part_payment?: number }) =>
       putDirectApprove(data),
+    onSuccess: () => {
+      // ⚡ Auto-refetch all related data after approval
+      queryClient.invalidateQueries({ queryKey: ["get-vc-monthly"] });
+      queryClient.invalidateQueries({ queryKey: ["reqest-to-pending"] });
+      queryClient.invalidateQueries({ queryKey: ["get-next-month-data"] });
+      queryClient.invalidateQueries({ queryKey: ["venture-by-id"] });
+    },
   });
 };
 
 // Admin  Redo Part Payment
 // ---------------------------------------------------------------------
 
-const putRedoApprove = async (
-  id:string) => {
+const putRedoApprove = async (id: string) => {
   const res = await api.put("/admin/redo_approve", {
     id,
   });
@@ -73,12 +81,18 @@ const putRedoApprove = async (
 };
 
 export const usePutRedoApprove = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: (id: string) =>
-      putRedoApprove(id),
+    mutationFn: (id: string) => putRedoApprove(id),
+    onSuccess: () => {
+      // ⚡ Auto-refetch after redo
+      queryClient.invalidateQueries({ queryKey: ["get-vc-monthly"] });
+      queryClient.invalidateQueries({ queryKey: ["reqest-to-pending"] });
+      queryClient.invalidateQueries({ queryKey: ["venture-by-id"] });
+    },
   });
 };
-
 
 // ---------------------------------------------------------------------
 
@@ -90,9 +104,17 @@ const putLoanDistribution = async (loan: any, id: string) => {
 };
 
 export const usePutLoanDistribution = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: ({ loan, id }: { loan: any; id: string }) =>
       putLoanDistribution(loan, id),
+    onSuccess: () => {
+      // ⚡ Auto-refetch after loan distribution
+      queryClient.invalidateQueries({ queryKey: ["get-vc-monthly"] });
+      queryClient.invalidateQueries({ queryKey: ["get-next-month-data"] });
+      queryClient.invalidateQueries({ queryKey: ["venture-by-id"] });
+    },
   });
 };
 
@@ -104,8 +126,17 @@ const putLock = async (id: string) => {
 };
 
 export const usePutLock = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: (id: string) => putLock(id),
+    onSuccess: () => {
+      // ⚡ Auto-refetch after locking month
+      queryClient.invalidateQueries({ queryKey: ["get-vc-monthly"] });
+      queryClient.invalidateQueries({ queryKey: ["get-next-month-data"] });
+      queryClient.invalidateQueries({ queryKey: ["get-vc-history"] });
+      queryClient.invalidateQueries({ queryKey: ["venture-by-id"] });
+    },
   });
 };
 
@@ -135,8 +166,16 @@ export const useGetReqestTopanding = (vc_id: string) => {
 };
 
 export const useRequestToPending = (id: string) => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: () => reqestTopanding(id),
+    onSuccess: () => {
+      // ⚡ Auto-refetch after request to pending
+      queryClient.invalidateQueries({ queryKey: ["reqest-to-pending", id] });
+      queryClient.invalidateQueries({ queryKey: ["get-vc-monthly", id] });
+      queryClient.invalidateQueries({ queryKey: ["venture-by-id"] });
+    },
   });
 };
 

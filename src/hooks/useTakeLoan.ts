@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 
 interface TakeLoanRequest {
@@ -29,7 +29,16 @@ export const takeLoan = async (
 
 // React hook for taking loan
 export const useTakeLoan = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: takeLoan,
+    onSuccess: () => {
+      // ⚡ Auto-refetch after taking loan
+      queryClient.invalidateQueries({ queryKey: ["get-vc-monthly"] });
+      queryClient.invalidateQueries({ queryKey: ["get-next-month-data"] });
+      queryClient.invalidateQueries({ queryKey: ["venture-by-id"] });
+      queryClient.invalidateQueries({ queryKey: ["reqest-to-pending"] });
+    },
   });
 };

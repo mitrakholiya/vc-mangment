@@ -70,8 +70,6 @@ export async function POST(req: Request) {
       $or: monthlyQuery,
     });
 
-    console.log(allVcMonthlyRecords);
-
     // Map for quick lookup: "year-month" -> total_loan_vyaj
     const vcMonthlyMap = new Map<string, number>();
     allVcMonthlyRecords.forEach((m) => {
@@ -205,7 +203,7 @@ export async function POST(req: Request) {
     updateQuery.$push = {
       exiting_panding: {
         user_id: userObjectId,
-        unpaid_amount: finalAmount < 0 ? Math.abs(finalAmount) : pendingAmount,
+        unpaid_amount: finalAmount < 0 ? finalAmount : pendingAmount,
         remaining_loan: currentRemainingLoan,
         total_monthly_contribution: totalContribution,
         total_vyaj: Math.round(totalInterestShare * 100) / 100,

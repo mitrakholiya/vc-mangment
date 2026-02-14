@@ -34,8 +34,11 @@ export async function GET(req: Request) {
 
     await dbConnect();
 
-    // Verify venture exists
-    const venture = await VentureModel.findById(vc_id);
+    // Verify venture exists and populate exiting_panding
+    const venture = await VentureModel.findById(vc_id).populate(
+      "exiting_panding.user_id",
+      "name email",
+    );
     if (!venture) {
       return NextResponse.json(
         { success: false, message: "Venture not found" },
@@ -53,15 +56,18 @@ export async function GET(req: Request) {
       .populate("user_id", "name email")
       .sort({ year: -1, month: -1 });
 
-    const vc_monthly = await VcMonthlyModel.find({ vc_id }).sort({
-      year: -1,
-      month: -1,
-    });
+    const vc_monthly = await VcMonthlyModel.find({ vc_id })
+      .populate("exiting_members.user_id", "name email")
+      .populate("loans.user_id", "name email")
+      .sort({
+        year: -1,
+        month: -1,
+      });
 
     return NextResponse.json({
       success: true,
       message: "History data found successfully",
-      data: { user_vc_monthly, vc_monthly },
+      data: { user_vc_monthly, vc_monthly, venture },
     });
   } catch (error: any) {
     console.error("Error fetching history:", error);

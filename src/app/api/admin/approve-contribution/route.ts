@@ -48,8 +48,9 @@ export async function PUT(req: Request) {
       );
     }
 
-    // 2. Verify that the Requestor is the Admin of the Venture
-    const venture = await VentureModel.findById(contribution.vc_id);
+    // check If Exitwe member's part payment re add by misteck 
+
+       const venture = await VentureModel.findById(contribution.vc_id);
 
     if (!venture) {
       return NextResponse.json(
@@ -58,6 +59,21 @@ export async function PUT(req: Request) {
       );
     }
 
+
+  //   const userid = contribution.user_id;
+
+
+  //   const isMember = venture.members.find((member: any) => member.user_id.toString() === userid.toString());
+
+  //  if(!isMember){
+  //   return NextResponse.json(
+  //     { success: false, message: "Member is no longer a member of this venture" },
+  //     { status: 200 },
+  //   );
+  //  }
+
+    // 2. Verify that the Requestor is the Admin of the Venture
+ 
     if (String(venture.created_by) !== String(decoded.userId)) {
       return NextResponse.json(
         {

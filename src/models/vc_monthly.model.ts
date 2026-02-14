@@ -1,12 +1,12 @@
 import mongoose, { Schema, Document, Types } from "mongoose";
 
 export interface IVcMonthlyLoan {
-  user_id: string;
+  user_id: string | any;
   loan_amount: number;
 }
 
 export interface IVcMonthlyExiting {
-  user_id: string;
+  user_id: string | any;
   total_monthly_contribution: number;
   remaning_loan: number;
   total_vyaj: number;
@@ -36,7 +36,8 @@ export interface IVcMonthly extends Document {
 const VcMonthlyLoanSchema = new Schema<IVcMonthlyLoan>(
   {
     user_id: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: "User",
       required: true,
     },
     loan_amount: {
@@ -51,7 +52,8 @@ const VcMonthlyLoanSchema = new Schema<IVcMonthlyLoan>(
 const VcMonthlyExitingSchema = new Schema<IVcMonthlyExiting>(
   {
     user_id: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: "User",
       required: true,
     },
     total_monthly_contribution: {
@@ -183,6 +185,11 @@ VcMonthlySchema.pre("save", async function (this: IVcMonthly) {
   // Calculate remaining_amount = total - total loans - total exiting
   this.remaining_amount = this.total - totalLoans - totalExiting;
 });
+
+// Force recompilation to pick up schema changes in development
+if (mongoose.models.VcMonthly) {
+  delete mongoose.models.VcMonthly;
+}
 
 const VcMonthlyModel =
   mongoose.models.VcMonthly ||

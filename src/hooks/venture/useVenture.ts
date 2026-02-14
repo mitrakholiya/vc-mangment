@@ -1,5 +1,5 @@
 import api from "@/lib/axios";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 export const getVenture = async () => {
   const res = await api.get("/venture");
@@ -42,5 +42,38 @@ export const manageVentureRequest = async (data: {
 export const useManageVentureRequest = () => {
   return useMutation({
     mutationFn: manageVentureRequest,
+  });
+};
+
+
+// ------------------------------------------------------------------------------
+// Exite member repayment
+// ------------------------------------------------------------------------------
+
+export const repayExitingDues = async (data: {
+  vc_id: string;
+  user_id: string;
+  paidAmount: number;
+}) => {
+  const res = await api.post("/venture/repay-exiting-dues", data);
+  return res.data;
+};
+
+export const useRepayExitingDues = () => {
+  return useMutation({
+    mutationFn: repayExitingDues,
+  });
+};
+
+export const getExitingDues = async (vc_id: string) => {
+  const res = await api.get(`/venture/repay-exiting-dues`,{params:{vc_id}});
+  return res.data.data;
+};
+
+export const useGetExitingDues = (vc_id: string) => {
+  return useQuery({
+    queryKey: ["exiting-dues", vc_id],
+    queryFn: () => getExitingDues(vc_id),
+    enabled: !!vc_id,
   });
 };

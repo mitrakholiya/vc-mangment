@@ -57,6 +57,19 @@ export async function PUT(req: Request) {
       );
     }
 
+    // check if member is exiting
+    const userid = contribution.user_id;
+
+
+    const isMember = venture.members.find((member: any) => member.user_id.toString() === userid.toString());
+
+   if(!isMember){
+    return NextResponse.json(
+      { success: false, message: "Member is no longer a member of this venture" },
+      { status: 200 },
+    );
+   }
+
     if (String(venture.created_by) !== String(decoded.userId)) {
       return NextResponse.json(
         {

@@ -28,6 +28,12 @@ export const Input = ({
       onChange={(e) => setValue(e.target.value)}
       size="small"
       fullWidth
+      InputProps={{
+        sx: {
+          height: 48, // 👈 control height here
+          alignItems: "center", // vertical centering
+        },
+      }}
       sx={{
         "& .MuiInputLabel-root": { color: "teal" },
         "& .MuiInputBase-input::placeholder": { color: "teal", opacity: 1 },

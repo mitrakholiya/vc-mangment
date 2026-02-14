@@ -64,12 +64,12 @@ const VcMonthlyModel = mongoose.models.VcMonthly || mongoose.model('VcMonthly', 
 
 async function seed() {
   try {
-    console.log('Connecting to MongoDB...');
+    // console.log('Connecting to MongoDB...');
     await mongoose.connect(MONGODB_URL);
-    console.log('Connected.');
+    // console.log('Connected.');
 
     const passwordHash = await bcrypt.hash("123456", 10);
-    const ventureName = "new seven ";
+    const ventureName = "testing data10";
     
     // 1. Create/Update 5 Users
     const users = [];
@@ -83,11 +83,11 @@ async function seed() {
                 password_hash: passwordHash,
                 phone: `123456789${i}`,
             });
-            console.log(`Created user: ${email}`);
+            // console.log(`Created user: ${email}`);
         } else {
             user.password_hash = passwordHash;
             await user.save();
-            console.log(`Updated user: ${email}`);
+            // console.log(`Updated user: ${email}`);
         }
         users.push(user);
     }
@@ -109,10 +109,10 @@ async function seed() {
 
     if (!venture) {
         venture = await VentureModel.create({ ...ventureData, fund_wallet: 0 });
-        console.log(`Created venture: ${ventureName}`);
+        // console.log(`Created venture: ${ventureName}`);
     } else {
         await VentureModel.findByIdAndUpdate(venture._id, ventureData);
-        console.log(`Updated venture: ${ventureName}`);
+        // console.log(`Updated venture: ${ventureName}`);
     }
 
     const vcId = venture._id;
@@ -125,14 +125,14 @@ async function seed() {
     users.forEach(u => userLoanState[u._id.toString()] = { remaining_loan: 0, original_loan: 0 });
 
     // 3. Clear existing data for these months to avoid duplicates or inconsistent states
-    console.log('Cleaning up existing monthly data...');
+    // console.log('Cleaning up existing monthly data...');
     for (let m = 0; m < monthsToCreate; m++) {
         const d = new Date(startYear, startMonth - 1 + m, 1);
         await VcUserMonthlyModel.deleteMany({ vc_id: vcId, month: d.getMonth() + 1, year: d.getFullYear() });
         await VcMonthlyModel.deleteMany({ vc_id: vcId.toString(), month: d.getMonth() + 1, year: d.getFullYear() });
     }
 
-    console.log('Seeding 5 months of records...');
+    // console.log('Seeding 5 months of records...');
     for (let m = 0; m < monthsToCreate; m++) {
         const currentIterDate = new Date(startYear, startMonth - 1 + m, 1);
         const month = currentIterDate.getMonth() + 1;
@@ -196,7 +196,7 @@ async function seed() {
                 paid_at: new Date(year, month - 1, 5)
             });
 
-            console.log(`  - Created UserMonthly for ${userIdStr}`);
+            // console.log(`  - Created UserMonthly for ${userIdStr}`);
             totalMonthlyContribution += monthlyContribution;
             totalLoanRepayment += loanEmi;
             totalLoanVyaj += loanInterest;
@@ -205,7 +205,7 @@ async function seed() {
         const totalCollections = totalMonthlyContribution + totalLoanRepayment + totalLoanVyaj;
         const monthEndBalance = Math.round((previousMonthRemaining + totalCollections - totalLoanGivenOut) * 100) / 100;
 
-        console.log(`  - Month ${month} totals: Contrib=${totalMonthlyContribution}, Repay=${totalLoanRepayment}, Vyaj=${totalLoanVyaj}, GivenOut=${totalLoanGivenOut}`);
+        // console.log(`  - Month ${month} totals: Contrib=${totalMonthlyContribution}, Repay=${totalLoanRepayment}, Vyaj=${totalLoanVyaj}, GivenOut=${totalLoanGivenOut}`);
 
         await VcMonthlyModel.create({
             vc_id: vcId.toString(),
@@ -222,14 +222,14 @@ async function seed() {
             lock: m === monthsToCreate - 1 ? false : true // Unlock only the last month
         });
 
-        console.log(`Seeded Month ${month}/${year} | Balance: ₹${monthEndBalance}`);
+        // console.log(`Seeded Month ${month}/${year} | Balance: ₹${monthEndBalance}`);
         previousMonthRemaining = monthEndBalance;
     }
 
     await VentureModel.findByIdAndUpdate(vcId, { fund_wallet: previousMonthRemaining });
     console.log('\nSeeding Successful!');
     console.log(`Venture ID: ${vcId}`);
-    console.log('Users: user1@gmail.com to user5@gmail.com (Pass: 123456)');
+    // console.log('Users: user1@gmail.com to user5@gmail.com (Pass: 123456)');
 
   } catch (err) {
     console.error('Seeding Failed:', err);

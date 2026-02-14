@@ -148,8 +148,8 @@ export async function POST(req: Request) {
 
     if (finalAmount < 0) {
       // User owes money to VC
-      paymentAmount = finalAmount; // Negative amount
-      pendingAmount = 0; // Or whatever logic you have for pending debt
+      paymentAmount = 0; // No money moves OUT of wallet now
+      pendingAmount = finalAmount; // Full debt is pending
     } else {
       // VC pays User (positive finalAmount)
       if (availableFunds >= finalAmount) {
@@ -167,11 +167,14 @@ export async function POST(req: Request) {
 
     // A. Update Monthly Record (Deduct Money)
     // We treat the exit payment as a "loan" (money out) in the current month to balance the books
+    // Explicitly convert user_id to ObjectId for accurate array operations
+    const userObjectId = new mongoose.Types.ObjectId(user_id);
+
     // A. Update Monthly Record (Deduct Money)
     // We treat the exit payment as a "loan" (money out) in the current month to balance the books
     let shouldSaveMonthly = false;
     latestVcMonthly.exiting_members.push({
-      user_id: user_id,
+      user_id: userObjectId,
       total_monthly_contribution: totalContribution,
       remaning_loan: currentRemainingLoan,
       total_vyaj: Math.round(totalInterestShare * 100) / 100,
@@ -187,36 +190,28 @@ export async function POST(req: Request) {
     // B. Update Venture (Remove Member and Add Pending if needed)
     console.log(`Processing Venture Update for VC: ${vc_id}, User: ${user_id}`);
 
-    // Explicitly convert user_id to ObjectId for accurate array operations
-    const userObjectId = new mongoose.Types.ObjectId(user_id);
-
+    // Unified update: Update fund_wallet and pull member
     const updateQuery: any = {
       $pull: { members: { user_id: userObjectId } },
     };
 
-    if (finalAmount < 0) {
-      // User owes money - add full debt to pending
-      console.log(
-        `Triggering $push to Exit_Pending for user ${user_id} with DEBT amount: ${Math.abs(finalAmount)}`,
-      );
-      updateQuery.$push = {
-        exiting_panding: {
-          user_id: userObjectId,
-          amount: Math.abs(finalAmount), // Store as positive debt value
-        },
-      };
-    } else if (pendingAmount > 0) {
-      // VC owes User - add remaining unpaid amount to pending
-      console.log(
-        `Triggering $push to Exit_Pending for user ${user_id} with PENDING amount: ${pendingAmount}`,
-      );
-      updateQuery.$push = {
-        exiting_panding: {
-          user_id: userObjectId,
-          amount: pendingAmount,
-        },
-      };
+    if (paymentAmount > 0) {
+      updateQuery.$inc = { fund_wallet: -paymentAmount };
     }
+
+    const initialPaymentRecord = { amount: paymentAmount, date: new Date() };
+
+    // Record the exit in exiting_panding (even if fully paid, for history)
+    updateQuery.$push = {
+      exiting_panding: {
+        user_id: userObjectId,
+        unpaid_amount: finalAmount < 0 ? Math.abs(finalAmount) : pendingAmount,
+        remaining_loan: currentRemainingLoan,
+        total_monthly_contribution: totalContribution,
+        total_vyaj: Math.round(totalInterestShare * 100) / 100,
+        total_paid: [initialPaymentRecord],
+      },
+    };
 
     const updatedVenture = await VentureModel.findByIdAndUpdate(
       vc_id,
@@ -248,6 +243,7 @@ export async function POST(req: Request) {
         pendingAmount: pendingAmount,
         walletBalance: availableFunds,
         status: pendingAmount > 0 ? "PARTIALLY_PAID" : "COMPLETED",
+        updatedVenture,
       },
     });
   } catch (error: any) {

@@ -1,5 +1,19 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 
+interface IExitingPandingPaid {
+  amount: number;
+  date: Date;
+}
+
+interface IExitingPanding {
+  user_id: mongoose.Types.ObjectId;
+  unpaid_amount: number;
+  total_monthly_contribution: number;
+  remaining_loan: number;
+  total_vyaj: number;
+  total_paid: IExitingPandingPaid[];
+}
+
 export interface IVenture extends Document {
   name: string;
   monthly_emi: number; // Was monthly_contribution
@@ -9,7 +23,7 @@ export interface IVenture extends Document {
   max_loan_amount: number; // Was max_loan_percent, now fixed amount
   loan_repayment_percent: number; // Fixed Monthly Loan Repayment percentage
   members: {
-    user_id: string;
+    user_id: Schema.Types.ObjectId;
     role: "ADMIN" | "MEMBER";
   }[]; // Array of objects with user_id and role
   requests?: string[]; // Array of strings (Request IDs or User IDs?)
@@ -17,14 +31,11 @@ export interface IVenture extends Document {
   // System fields kept for compatibility/logic
   created_at?: Date;
   updated_at?: Date;
-  created_by: string;
+  created_by: Schema.Types.ObjectId;
   fund_wallet: number;
   status: string;
- 
-  exiting_panding?: {
-    user_id: string;
-    amount: number;
-  }[];
+
+  exiting_panding?: IExitingPanding[];
 }
 
 const VentureSchema: Schema = new Schema(
@@ -58,17 +69,46 @@ const VentureSchema: Schema = new Schema(
           ref: "User",
           required: true,
         },
-        amount: {
+        unpaid_amount: {
           type: Number,
           required: true,
           default: 0,
         },
+        total_monthly_contribution: {
+          type: Number,
+          required: true,
+          default: 0,
+        },
+        remaining_loan: {
+          type: Number,
+          required: true,
+          default: 0,
+        },
+        total_vyaj: {
+          type: Number,
+          required: true,
+          default: 0,
+        },
+        total_paid: [
+          {
+            amount: {
+              type: Number,
+              required: true,
+              default: 0,
+            },
+            date: {
+              type: Date,
+              required: true,
+              default: Date.now,
+            },
+          },
+        ],
       },
     ],
     requests: [{ type: Schema.Types.ObjectId, ref: "User" }], // Changed from "user" to "User"
 
     // Existing fields
-    created_by: { type: String, required: true, ref: "User" },
+    created_by: { type: Schema.Types.ObjectId, required: true, ref: "User" },
     fund_wallet: { type: Number, required: true, default: 0 },
     status: {
       type: String,

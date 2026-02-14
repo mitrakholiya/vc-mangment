@@ -94,9 +94,9 @@ const Page: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen text-black sm:p-4 bg-background">
+    <div className="min-h-screen text-black sm:p-4 bg-background px-[12px]">
       <div className=" bg-background sm:bg-white w-full rounded-lg p-2 space-y-4 max-w-2xl mx-auto">
-        <h2 className="text-2xl font-extrabold! font-secondary text-primary  border-b pb-2 pt-2">
+        <h2 className="text-3xl font-extrabold! font-secondary text-primary  border-b py-[20px]">
           Create New Venture
         </h2>
 

@@ -8,6 +8,7 @@ import { Input } from "@/components/Input";
 import { CircularProgress } from "@mui/material";
 
 import Image from "next/image";
+import LoginBackground from "@/components/LoginBackground";
 
 const Page = () => {
   const router = useRouter();
@@ -47,7 +48,7 @@ const Page = () => {
       console.log(err);
       toast.error("Something went wrong");
     }
-    setIsLoading(false);
+    // setIsLoading(false);
   };
 
   if (isLoading) {
@@ -59,8 +60,8 @@ const Page = () => {
   }
 
   return (
-    <div className="flex h-[100dvh]  flex-col  items-center sm:justify-evenly justify-end bg-transparent sm:px-4 relative">
-      <div className="sm:relative absolute inset-0  z-[-1] sm:top-0 top-[80px]  ">
+    <div className="flex h-[100dvh]  flex-col  items-center sm:justify-evenly justify-center bg-transparent sm:px-4 relative">
+      <div className="sm:relative absolute inset-0  z-[1] sm:top-0 top-[80px]  ">
         <div className="flex w-full justify-center">
           <Image
             src="/icons/syncera.png"
@@ -72,9 +73,10 @@ const Page = () => {
           />
         </div>
       </div>
-      <div className="absolute inset-0 bg-background z-[-2]"></div>
+      {/* <div className="absolute inset-0 bg-background z-[-2]"></div> */}
+      <LoginBackground />
 
-      <div className="w-full sm:w-1/2 max-w-md rounded-[30px_30px_0_0] sm:rounded-xl bg-white p-8 shadow-lg border border-gray-100 text-gray-900">
+      <div className="w-[90%] sm:w-1/2 max-w-md rounded-xl backdrop-blur-md bg-white p-8 shadow-lg border border-gray-100 text-gray-900 mt-[200px] sm:mt-[0px] relative z-[10]">
         <div className="mb-8 text-center">
           <h2 className="text-3xl font-bold! text-gray-900 font-secondary">
             Create

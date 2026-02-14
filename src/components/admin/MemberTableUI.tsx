@@ -37,6 +37,10 @@ import NextMonthData from "./NextMonthData";
 import { Share2, Download } from "lucide-react";
 import { shareMonthlyPdf } from "@/lib/shareMonthlyData";
 import Loading from "../Loading";
+import {
+  useGetExitingDues,
+  useRepayExitingDues,
+} from "@/hooks/venture/useVenture";
 
 interface VcUserMonthly {
   _id: string;
@@ -87,7 +91,10 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
 }) => {
   const [loading, setLoading] = React.useState(false);
 
+  const { data: exitingDues } = useGetExitingDues(vcId);
+
   const { mutateAsync: redoApprovel } = usePutRedoApprove();
+  const { mutateAsync: repayDues } = useRepayExitingDues();
 
   const handelRedoApprovel = async (id: string) => {
     setLoading(true);
@@ -182,8 +189,15 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
   >(null);
   const [partPaymentInput, setPartPaymentInput] = React.useState("");
 
+  const [isRepayDialogOpen, setIsRepayDialogOpen] = React.useState(false);
+  const [selectedExitingMember, setSelectedExitingMember] = React.useState<
+    any | null
+  >(null);
+  const [repayAmountInput, setRepayAmountInput] = React.useState("");
+
   const { mutateAsync: onLock } = usePutLock();
 
+  // Loan dialog
   const handleOpenLoanDialog = () => {
     setIsLoanModalOpen(true);
     setSelectedUserForLoan(null);
@@ -194,6 +208,54 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
     setIsLoanModalOpen(false);
     setSelectedUserForLoan(null);
     setLoanAmountInput("");
+  };
+
+  // Repayment dialog
+
+  const handleOpenRepayDialog = (id: string, amount: number) => {
+    const member = exitingDues?.find((m: any) => m._id === id);
+    setSelectedExitingMember(member);
+    setRepayAmountInput(amount.toString());
+    setIsRepayDialogOpen(true);
+  };
+
+  const handleCloseRepayDialog = () => {
+    setIsRepayDialogOpen(false);
+    setSelectedExitingMember(null);
+    setRepayAmountInput("");
+  };
+
+  const handleConfirmRepay = async () => {
+    if (!selectedExitingMember) return;
+    setLoading(true);
+    const amountVal = Number(repayAmountInput);
+    if (amountVal > RemainingAmount) {
+      toast.error(
+        `Insufficient venture funds. Max available: ₹${RemainingAmount.toLocaleString()}`,
+      );
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const res = await repayDues({
+        vc_id: vcId,
+        user_id: selectedExitingMember.user_id._id,
+        paidAmount: amountVal,
+      });
+
+      if (res.success) {
+        toast.success(res.message || "Repayment recorded successfully");
+        handleCloseRepayDialog();
+        refetch();
+      } else {
+        toast.error(res.message || "Failed to record repayment");
+      }
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSelectUserForLoan = (user: any) => {
@@ -343,7 +405,7 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
     // Call mutation with object
     setLoading(true);
     const res = await onApprove(approveSelectedId, partPayment);
-    
+
     if (res?.success === true) {
       toast.success("Approved successfully");
       refetch();
@@ -926,6 +988,77 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
         </DialogActions>
       </Dialog>
 
+      {/* Repay Dialog */}
+      <Dialog
+        open={isRepayDialogOpen}
+        onClose={handleCloseRepayDialog}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle className="text-sm font-bold">
+          Record Repayment
+        </DialogTitle>
+        <DialogContent dividers>
+          <div className="pt-2 space-y-4">
+            <div className="bg-gray-50 p-3 rounded-lg border border-gray-100">
+              <Typography
+                variant="caption"
+                className="text-gray-500 uppercase font-bold tracking-wider"
+              >
+                Member
+              </Typography>
+              <Typography className="font-bold text-gray-800">
+                {selectedExitingMember?.user_id?.name || "Unknown"}
+              </Typography>
+            </div>
+
+            <TextField
+              label="Repayment Amount"
+              type="number"
+              fullWidth
+              variant="outlined"
+              size="small"
+              value={repayAmountInput}
+              onChange={(e) => setRepayAmountInput(e.target.value)}
+              InputProps={{
+                startAdornment: <span className="mr-1 text-gray-400">₹</span>,
+              }}
+              error={
+                Number(repayAmountInput) <= 0 ||
+                Number(repayAmountInput) >
+                  (selectedExitingMember?.unpaid_amount || 0) ||
+                Number(repayAmountInput) > RemainingAmount
+              }
+              helperText={
+                Number(repayAmountInput) > RemainingAmount
+                  ? `Insufficient venture funds. Available: ₹${RemainingAmount.toLocaleString()}`
+                  : `Total dues: ₹${selectedExitingMember?.unpaid_amount?.toLocaleString() || 0}`
+              }
+            />
+          </div>
+        </DialogContent>
+        <DialogActions className="bg-gray-50">
+          <Button onClick={handleCloseRepayDialog} size="small" color="inherit">
+            Cancel
+          </Button>
+          <Button
+            onClick={handleConfirmRepay}
+            variant="contained"
+            size="small"
+            color="primary"
+            disabled={
+              !repayAmountInput ||
+              Number(repayAmountInput) <= 0 ||
+              Number(repayAmountInput) >
+                (selectedExitingMember?.unpaid_amount || 0) ||
+              Number(repayAmountInput) > RemainingAmount
+            }
+          >
+            Confirm Repayment
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       {/* Add Loan Dialog */}
       <Dialog
         open={isLoanModalOpen}
@@ -1189,256 +1322,241 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
         </DialogActions>
       </Dialog>
 
-      {/* Current month Summery */}
-      <div className="py-[20px] flex justify-center">
-        {compalated || done ? (
-          <div className="w-full max-w-md px-[10px]">
-            {(() => {
-              // Find matching VC Monthly record
-              // Ensure correct type matching for month/year (string vs number)
-              const matchingVcMonthly = vcMonthlyData.find(
-                (m: any) =>
-                  m.month == userVcMonthlyData[0]?.month &&
-                  m.year == userVcMonthlyData[0]?.year,
-              );
+      {/* Current month Summary */}
+      <div className="py-8 flex justify-center">
+        {(compalated || done) &&
+          (() => {
+            const matchingVcMonthly = vcMonthlyData.find(
+              (m: any) =>
+                m.month == userVcMonthlyData[0]?.month &&
+                m.year == userVcMonthlyData[0]?.year,
+            );
 
-              if (!matchingVcMonthly) return null;
+            if (!matchingVcMonthly) return null;
 
-              return (
-                <TableContainer
-                  component={Paper}
-                  className="shadow-md rounded-2 mb-8"
-                >
-                  <Table size="small">
-                    <TableHead className="bg-primary">
-                      <TableRow>
-                        <TableCell
-                          className="text-white! font-bold"
-                          colSpan={2}
-                          align="center"
-                        >
-                          {monthName} Monthly Summary
-                        </TableCell>
-                      </TableRow>
-                    </TableHead>
+            const totalCollected =
+              (matchingVcMonthly.total_monthly_contribution || 0) +
+              (matchingVcMonthly.total_loan_vyaj || 0) +
+              (matchingVcMonthly.total_loan_repayment || 0) +
+              (matchingVcMonthly.total_part_payment || 0);
 
-                    <TableBody>
-                      {/* Last Month Remaining */}
+            return (
+              <div className="w-full max-w-2xl px-4">
+                <Paper className="shadow-lg rounded-2xl overflow-hidden border border-gray-100">
+                  <Box className="bg-primary p-4 text-center">
+                    <Typography
+                      variant="h6"
+                      className="text-white font-bold tracking-wide uppercase"
+                    >
+                      {monthName} Monthly Summary
+                    </Typography>
+                  </Box>
 
-                      <TableRow>
-                        <TableCell className="font-medium text-gray-700">
-                          Last Month Remaining
-                        </TableCell>
-                        <TableCell align="right" className="font-bold">
-                          ₹
-                          {matchingVcMonthly.last_month_remaining_amount?.toLocaleString() ||
-                            0}
-                        </TableCell>
-                      </TableRow>
+                  <div className="p-6 space-y-6">
+                    {/* Opening Balance */}
+                    <div className="flex justify-between items-center bg-gray-50 p-4 rounded-xl border border-gray-100">
+                      <div>
+                        <Typography className="text-gray-500 text-xs font-bold uppercase tracking-wider">
+                          Opening Balance
+                        </Typography>
+                        <Typography className="text-gray-400 text-[10px]">
+                          Inherited from last month
+                        </Typography>
+                      </div>
+                      <Typography className="text-xl font-bold text-gray-800">
+                        ₹
+                        {matchingVcMonthly.last_month_remaining_amount?.toLocaleString() ||
+                          0}
+                      </Typography>
+                    </div>
 
-                      {/* Collections Breakdown */}
-                      <TableRow className="bg-green-50">
-                        <TableCell
-                          colSpan={2}
-                          className="font-bold text-xs text-green-800"
-                        >
-                          Collections (Added)
-                        </TableCell>
-                      </TableRow>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Inflows */}
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2 mb-1">
+                          <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                          <Typography className="text-xs font-bold text-green-700 uppercase tracking-wider">
+                            Total Collections
+                          </Typography>
+                        </div>
+                        <div className="space-y-2 pl-4 border-l-2 border-green-100">
+                          <div className="flex justify-between text-sm">
+                            <span className="text-gray-600">
+                              Monthly Contribution
+                            </span>
+                            <span className="font-semibold text-green-600">
+                              +₹
+                              {matchingVcMonthly.total_monthly_contribution?.toLocaleString() ||
+                                0}
+                            </span>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span className="text-gray-600">Loan Interest</span>
+                            <span className="font-semibold text-green-600">
+                              +₹
+                              {matchingVcMonthly.total_loan_vyaj?.toLocaleString() ||
+                                0}
+                            </span>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span className="text-gray-600">Loan EMI</span>
+                            <span className="font-semibold text-green-600">
+                              +₹
+                              {matchingVcMonthly.total_loan_repayment?.toLocaleString() ||
+                                0}
+                            </span>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span className="text-gray-600">Part Payment</span>
+                            <span className="font-semibold text-green-600">
+                              +₹
+                              {matchingVcMonthly.total_part_payment?.toLocaleString() ||
+                                0}
+                            </span>
+                          </div>
+                          <div className="pt-2 border-t border-green-50 flex justify-between">
+                            <span className="text-gray-800 font-bold">
+                              Subtotal
+                            </span>
+                            <span className="font-bold text-green-700">
+                              ₹{totalCollected.toLocaleString()}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
 
-                      {/* Monthly Contribution */}
-                      <TableRow>
-                        <TableCell className="pl-6 text-sm text-gray-600">
-                          Monthly Contribution
-                        </TableCell>
-                        <TableCell
-                          align="right"
-                          className="text-green-600 font-medium"
-                        >
-                          + ₹
-                          {matchingVcMonthly.total_monthly_contribution?.toLocaleString() ||
-                            0}
-                        </TableCell>
-                      </TableRow>
-
-                      {/* Loan Interest */}
-                      <TableRow>
-                        <TableCell className="pl-6 text-sm text-gray-600">
-                          Loan Interest
-                        </TableCell>
-                        <TableCell
-                          align="right"
-                          className="text-green-600 font-medium"
-                        >
-                          + ₹
-                          {matchingVcMonthly.total_loan_vyaj?.toLocaleString() ||
-                            0}
-                        </TableCell>
-                      </TableRow>
-
-                      {/* Loan EMI */}
-                      <TableRow>
-                        <TableCell className="pl-6 text-sm text-gray-600">
-                          Loan EMI
-                        </TableCell>
-                        <TableCell
-                          align="right"
-                          className="text-green-600 font-medium"
-                        >
-                          + ₹
-                          {matchingVcMonthly.total_loan_repayment?.toLocaleString() ||
-                            0}
-                        </TableCell>
-                      </TableRow>
-
-                      {/* Part Payment */}
-                      <TableRow>
-                        <TableCell className="pl-6 text-sm text-gray-600">
-                          Part Payment
-                        </TableCell>
-                        <TableCell
-                          align="right"
-                          className="text-green-600 font-medium"
-                        >
-                          + ₹
-                          {matchingVcMonthly.total_part_payment?.toLocaleString() ||
-                            0}
-                        </TableCell>
-                      </TableRow>
-
-                      {/* Total Collected Row */}
-                      <TableRow className="bg-gray-100 border-t border-gray-300">
-                        <TableCell className="font-bold text-gray-800">
-                          Total Collected
-                        </TableCell>
-                        <TableCell
-                          align="right"
-                          className="font-bold text-green-700"
-                        >
-                          ₹
-                          {(
-                            (matchingVcMonthly.total_monthly_contribution ||
-                              0) +
-                            (matchingVcMonthly.total_loan_vyaj || 0) +
-                            (matchingVcMonthly.total_loan_repayment || 0) +
-                            (matchingVcMonthly.total_part_payment || 0)
-                          ).toLocaleString()}
-                        </TableCell>
-                      </TableRow>
-
-                      {/* New Loans */}
-                      {matchingVcMonthly.loans?.length > 0 && (
-                        <>
-                          <TableRow className="bg-gray-100">
-                            <TableCell
-                              colSpan={2}
-                              className="font-bold text-xs "
-                            >
-                              New Loans Distributed
-                            </TableCell>
-                          </TableRow>
-                          {matchingVcMonthly.loans.map(
-                            (loan: any, idx: number) => {
-                              // Correctly lookup user name from the passed user data
-                              const userName =
-                                userVcMonthlyData.find(
-                                  (u: any) => u.user_id._id === loan.user_id,
-                                )?.user_id.name || "Unknown User";
-                              return (
-                                <TableRow key={idx}>
-                                  <TableCell className="pl-6 text-sm text-secodary!">
-                                    {userName}
-                                  </TableCell>
-                                  <TableCell
-                                    align="right"
-                                    className="text-yellow-600! font-medium "
-                                  >
-                                    - ₹{loan.loan_amount?.toLocaleString()}
-                                  </TableCell>
-                                </TableRow>
-                              );
-                            },
+                      {/* Outflows */}
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2 mb-1">
+                          <div className="w-2 h-2 rounded-full bg-orange-500"></div>
+                          <Typography className="text-xs font-bold text-orange-700 uppercase tracking-wider">
+                            Distributions
+                          </Typography>
+                        </div>
+                        <div className="space-y-2 pl-4 border-l-2 border-orange-100 h-full">
+                          {matchingVcMonthly.loans?.length > 0 ||
+                          matchingVcMonthly.exiting_members?.length > 0 ? (
+                            <>
+                              {matchingVcMonthly.loans?.map(
+                                (loan: any, idx: number) => {
+                                  const userName =
+                                    userVcMonthlyData.find(
+                                      (u) => u.user_id._id === loan.user_id,
+                                    )?.user_id.name || "Unknown Member";
+                                  return (
+                                    <div
+                                      key={`loan-${idx}`}
+                                      className="flex justify-between text-sm"
+                                    >
+                                      <span
+                                        className="text-gray-600 truncate max-w-[120px]"
+                                        title={userName}
+                                      >
+                                        Loan: {userName}
+                                      </span>
+                                      <span className="font-semibold text-orange-600">
+                                        -₹{loan.loan_amount?.toLocaleString()}
+                                      </span>
+                                    </div>
+                                  );
+                                },
+                              )}
+                              {matchingVcMonthly.exiting_members?.map(
+                                (v: any, idx: number) => {
+                                  const userName =
+                                    userVcMonthlyData.find(
+                                      (u) => u.user_id._id === v.user_id,
+                                    )?.user_id.name || "Unknown Member";
+                                  return (
+                                    <div
+                                      key={`exit-${idx}`}
+                                      className="flex justify-between text-sm"
+                                    >
+                                      <span
+                                        className="text-gray-600 truncate max-w-[120px]"
+                                        title={userName}
+                                      >
+                                        Exit: {userName}
+                                      </span>
+                                      <span className="font-semibold text-orange-600">
+                                        -₹{v.total_paid?.toLocaleString()}
+                                      </span>
+                                    </div>
+                                  );
+                                },
+                              )}
+                            </>
+                          ) : (
+                            <Typography className="text-gray-400 text-sm italic">
+                              No distributions recorded
+                            </Typography>
                           )}
-                        </>
-                      )}
+                        </div>
+                      </div>
+                    </div>
 
-                      {/* Exiting Member */}
-
-                      {matchingVcMonthly.exiting_members?.length > 0 && (
-                        <>
-                          <TableRow className="bg-gray-100">
-                            <TableCell
-                              colSpan={2}
-                              className="font-bold text-xs text-gray-600"
+                    {/* Exiting Dues Tracker */}
+                    {exitingDues?.length > 0 && (
+                      <div className="bg-yellow-50/50 p-4 rounded-xl border border-yellow-100">
+                        <Typography className="text-xs font-bold text-yellow-800 uppercase tracking-wider mb-2">
+                          Exiting Dues (Pending Repayment)
+                        </Typography>
+                        <div className="space-y-2">
+                          {exitingDues.map((item: any) => (
+                            <div
+                              key={item._id}
+                              className="flex justify-between items-center text-sm"
                             >
-                              Exiting Members
-                            </TableCell>
-                          </TableRow>
-                          {matchingVcMonthly.exiting_members.map(
-                            (v: any, idx: number) => {
-                              // Correctly lookup user name from the passed user data
-                              const userName =
-                                userVcMonthlyData.find(
-                                  (u: any) => u.user_id._id === v.user_id,
-                                )?.user_id.name || "Unknown User";
-                              return (
-                                <TableRow key={idx}>
-                                  <div className="flex justify-between items-center gap-2">
-                                    <span className="pl-6 text-xs">
-                                      {userName}
-                                    </span>
+                              <span className="text-gray-700">
+                                {item.user_id?.name || "Unknown"}
+                              </span>
+                              <div className="flex items-center gap-3">
+                                <span className="font-bold text-gray-900">
+                                  ₹{item.unpaid_amount.toLocaleString()}
+                                </span>
+                                <Button
+                                  variant="outlined"
+                                  size="small"
+                                  className="capitalize text-[10px] h-6 px-3 border-yellow-600 text-yellow-700 hover:bg-yellow-600 hover:text-white"
+                                  onClick={() =>
+                                    handleOpenRepayDialog(
+                                      item._id,
+                                      item.unpaid_amount,
+                                    )
+                                  }
+                                >
+                                  Repay
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
 
-                                    <span className="text-xs text-primary">
-                                      Total monthly hapto
-                                      <br />₹
-                                      {v?.total_monthly_contribution?.toLocaleString()}
-                                    </span>
-
-                                    <span className="text-xs text-primary">
-                                      Total Vyaj ₹
-                                      {v?.total_vyaj?.toLocaleString()}
-                                    </span>
-                                    <span className="text-xs text-primary">
-                                      Total Loan ₹
-                                      {v?.remaning_loan?.toLocaleString()}
-                                    </span>
-                                  </div>
-                                  <TableCell>
-                                    <span className="text-xs text-primary">
-                                      Total Paid ₹
-                                      {v?.total_paid?.toLocaleString()}
-                                    </span>
-                                  </TableCell>
-                                </TableRow>
-                              );
-                            },
-                          )}
-                        </>
-                      )}
-
-                      {/* Final Remaining */}
-                      <TableRow className="bg-gray-50 border-t-2 border-gray-200">
-                        <TableCell className="font-bold text-gray-900 text-lg">
-                          Remaining Amount
-                        </TableCell>
-                        <TableCell
-                          align="right"
-                          className="font-bold text-green-700 text-lg"
-                        >
+                    {/* Closing Balance */}
+                    <div className="pt-6 border-t border-gray-200">
+                      <div className="flex justify-between items-center bg-primary p-4 rounded-xl shadow-inner">
+                        <div>
+                          <Typography className="text-white! text-xs font-bold uppercase tracking-wider opacity-80">
+                            Remaining Balance
+                          </Typography>
+                          <Typography className="text-white! text-[10px] opacity-70">
+                            Closing balance for {monthName}
+                          </Typography>
+                        </div>
+                        <Typography className="text-2xl font-black text-white!">
                           ₹
                           {matchingVcMonthly.remaining_amount?.toLocaleString() ||
                             0}
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              );
-            })()}
-          </div>
-        ) : (
-          ""
-        )}
+                        </Typography>
+                      </div>
+                    </div>
+                  </div>
+                </Paper>
+              </div>
+            );
+          })()}
       </div>
 
       {compalated && (
@@ -1501,7 +1619,7 @@ const MemberTableUI: React.FC<MemberTableUIProps> = ({
                 </svg>
               }
             >
-              Leave Mange
+              Mange Member
             </Button>
           </Link>
         </div>

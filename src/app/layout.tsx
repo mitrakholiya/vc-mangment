@@ -8,19 +8,19 @@ import { Inter } from "next/font/google";
 
 const inter = Inter({ subsets: ["latin"] });
 
-// export const metadata: Metadata = {
-//   title: "VC Management",
-//   description: "Manage your Venture Capital contributions and loans easily.",
-//   manifest: "/manifest.json",
-//   appleWebApp: {
-//     capable: true,
-//     statusBarStyle: "default",
-//     title: "VC Management",
-//   },
-//   formatDetection: {
-//     telephone: false,
-//   },
-// };
+export const metadata: Metadata = {
+  title: "VC Management",
+  description: "Manage your Venture Capital contributions and loans easily.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "VC Management",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+};
 
 export const viewport = {
   themeColor: "#FFFFFF",
